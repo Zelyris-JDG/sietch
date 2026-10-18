@@ -4,6 +4,13 @@
  */
 import { chromium } from "@playwright/test";
 import { mkdirSync } from "node:fs";
+import sharp from "sharp";
+
+/** Capture en WebP (dépôt léger) : PNG en mémoire → WebP qualité 82. */
+async function shot(page, path) {
+  const buf = await page.screenshot();
+  await sharp(buf).webp({ quality: 82 }).toFile(path);
+}
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, "").split("=")));
 const label = args.label ?? "captures";
@@ -22,7 +29,7 @@ for (const v of views) {
   const ctx = await browser.newContext({ viewport: v.viewport, isMobile: v.isMobile, hasTouch: v.hasTouch, deviceScaleFactor: v.deviceScaleFactor ?? 1, locale: "fr-FR" });
   const page = await ctx.newPage();
   await page.goto(url, { waitUntil: "networkidle" });
-  await page.screenshot({ path: `${dir}/${v.name}-00-intro.png` });
+  await shot(page, `${dir}/${v.name}-00-intro.webp`);
   await page.getByRole("button", { name: "Entrer en silence" }).click();
   await page.waitForTimeout(1200);
   for (const [i, id] of stops.entries()) {
@@ -35,7 +42,7 @@ for (const v of views) {
     const target = h > v.viewport.height * 1.5 ? top + h * 0.45 : top - 40;
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), target);
     await page.waitForTimeout(1600);
-    await page.screenshot({ path: `${dir}/${v.name}-${String(i + 1).padStart(2, "0")}-${id}.png` });
+    await shot(page, `${dir}/${v.name}-${String(i + 1).padStart(2, "0")}-${id}.webp`);
   }
   await ctx.close();
 }
