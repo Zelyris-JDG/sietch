@@ -211,7 +211,19 @@ html[data-descent="on"] .hud--alt { opacity: 1; transform: none; }
 .hud-nav a[aria-current="true"] i { width: 28px; }
 
 /* ---- Intro ---------------------------------------------------------------------- */
-.intro { position: fixed; inset: 0; z-index: 50; background: var(--basalt); display: grid; place-items: center; text-align: center; padding: var(--gutter); transition: opacity 900ms var(--ease-out), visibility 0s linear 900ms; }
+/* L'intro tient dans n'importe quel écran : grille + marges automatiques (centrée quand il y a de la place, alignée en
+   haut et défilable sinon — téléphone à l'horizontale, petite fenêtre), jamais de bouton hors écran. */
+.intro { position: fixed; inset: 0; z-index: 50; background: var(--basalt); display: grid; overflow-y: auto; text-align: center; padding: var(--gutter); transition: opacity 900ms var(--ease-out), visibility 0s linear 900ms; }
+.intro__inner { margin: auto; }
+@media (max-height: 600px) { .intro__inner { gap: 1rem; } .intro__breath { height: 28px; } }
+/* Écran bas (téléphone à l'horizontale, petite fenêtre) : la plaque d'altitude passe en bas à gauche, compacte,
+   comme sur téléphone, pour ne pas couvrir le texte qui commence près du haut. */
+@media (max-height: 520px) {
+  .hud--alt { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); left: var(--gutter); padding: 6px 10px; gap: 0; }
+  .hud__label, .hud__phase { display: none; }
+  .hud__value { font-size: 0.88rem; }
+  .toast { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 52px); }
+}
 .intro[data-state="gone"] { opacity: 0; visibility: hidden; pointer-events: none; }
 html[data-intro="seen"] .intro { display: none; } /* intro déjà vue dans la session (posé avant le premier rendu par le script d'amorçage) : aucun éclair au retour d'une page */
 .intro__inner { display: grid; gap: 2rem; justify-items: center; max-width: 34rem; }
