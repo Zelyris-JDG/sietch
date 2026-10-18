@@ -508,7 +508,7 @@ b, strong { font-weight: 500; }
   .lexique__hint { display: none; } /* l'indication est reprise dans le message « aucun terme » */
 }
 @media (forced-colors: active) {
-  .lexique__filter[aria-pressed="true"] { outline: 2px solid CanvasText; outline-offset: -5px; }
+  .lexique__filter[aria-pressed="true"] { border: 2px solid Highlight; } /* état pressé par la bordure : le contour de :focus-visible reste libre et visible */
 }
 
 /* ---- Page 404 (C2 ; ex-app/not-found.css, idem) ---- */

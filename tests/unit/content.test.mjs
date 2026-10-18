@@ -122,7 +122,7 @@ test("compte à rebours : les dates de PART_THREE sont celles de FILMS et de REL
   assert.ok(release, "sortie dune-3 présente dans RELEASES");
   assert.equal(release.date, PART_THREE.fr);
   const frLong = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MONTHS[m - 1]} ${y}`; };
-  assert.ok(release.note.includes(`États-Unis : ${frLong(PART_THREE.us)}`), "la note de RELEASES donne la même date américaine");
+  assert.ok(release.note.replace(/[\u202f\u00a0]/g, " ").includes(`États-Unis : ${frLong(PART_THREE.us)}`), "la note de RELEASES donne la même date américaine"); // espaces insécables (typographie française) ramenées à des espaces
   const film = FILMS.find((f) => f.id === PART_THREE.filmId);
   assert.ok(film, "film villeneuve-2026 présent dans FILMS");
   assert.equal(film.title, PART_THREE.title);

@@ -122,6 +122,10 @@ Les sites officiels étaient bloqués depuis la session : chaque adresse a été
   <https://funcom.helpshift.com/hc/en/4-dune-awakening/>
 - [ ] Jeu — éditeur Funcom
   <https://www.funcom.com>
+- [ ] X · @DuneAwakening (kit presse Funcom)
+  <https://x.com/DuneAwakening>
+- [ ] YouTube · Funcom (kit presse Funcom)
+  <https://www.youtube.com/funcom>
 - [ ] Communauté du jeu — wiki
   <https://awakening.wiki>
 - [ ] Communauté du jeu — cartes interactives
@@ -141,7 +145,7 @@ Les sites officiels étaient bloqués depuis la session : chaque adresse a été
 - [ ] Films — Warner Bros.
   <https://www.warnerbros.com>
 - [ ] Série — HBO
-  <https://www.hbo.com>
+  <https://www.hbo.com/dune-prophecy>
 - [ ] Série — communiqués Warner Bros. Discovery
   <https://press.wbd.com/na/property/dune-prophecy>
 - [ ] Livres — site officiel des romans

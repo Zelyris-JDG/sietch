@@ -7,7 +7,7 @@ test.describe("Pages du refuge", () => {
     await input.fill("EPICE");
     await expect(page.locator("#epice")).toBeVisible();
     await expect(page.locator("#arrakeen")).toHaveCount(0);
-    await expect(page.getByRole("status")).toContainText(/terme/i);
+    await expect(page.getByRole("status")).toHaveText(/^\d+ termes? affichés? sur 41$/); // le compteur différé (300 ms) doit refléter le filtre, pas le texte initial
     await input.fill("");
     const lieux = page.getByRole("button", { name: /^Lieux/ });
     await lieux.click();

@@ -103,8 +103,9 @@ export function LexiqueExplorer() {
   // puis on défile jusqu'à elle. Au chargement, tout est affiché : le navigateur fait le travail seul.
   useEffect(() => {
     const onHash = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      if (!id || (!TERM_BY_ID[id] && !TERM_GROUPS.some((g) => `g-${g.id}` === id))) return;
+      let id: string;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; } // fragment mal encodé (#100%) : rien à faire
+      if (!id || (!Object.hasOwn(TERM_BY_ID, id) && !TERM_GROUPS.some((g) => `g-${g.id}` === id))) return;
       setQuery("");
       setGroup("tous");
       window.requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
