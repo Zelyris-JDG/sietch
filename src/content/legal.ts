@@ -70,7 +70,7 @@ export const legalSections: LegalSection[] = [
   {
     heading: "Données personnelles",
     paragraphs: [
-      "Ce site ne collecte aucune donnée personnelle, ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience. Deux préférences (son activé ou coupé ; message du ver déjà découvert) sont mémorisées uniquement dans votre navigateur, sans identifiant, et peuvent être effacées depuis ses réglages.",
+      "Ce site ne collecte aucune donnée personnelle, ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience. Trois informations sont mémorisées uniquement dans votre navigateur, sans identifiant : le son (activé ou coupé), le message du ver déjà découvert, et l'introduction déjà vue (le temps d'une session). Elles peuvent être effacées depuis ses réglages.",
     ],
   },
 ];

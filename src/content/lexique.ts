@@ -8,7 +8,7 @@ export const TERMS: Term[] = [
   { id: "arrakis", word: "Arrakis", group: "lieux", def: "Troisième planète de l'étoile Canopus, surnommée Dune. Un désert d'un pôle à l'autre, et la seule source d'épice de l'univers connu." },
   { id: "sietch", word: "Sietch", group: "lieux", def: "Chez les Fremen, une communauté installée dans une caverne fortifiée du désert : un refuge, un lieu d'assemblée, une famille élargie." },
   { id: "arrakeen", word: "Arrakeen", group: "lieux", def: "Première ville d'Arrakis, au pied du Mur du Bouclier ; siège du gouvernement planétaire et de l'astroport." },
-  { id: "carthag", word: "Carthag", group: "lieux", def: "Ville bâtie par les Harkonnen au nord d'Arrakeen pendant leur mandat sur Arrakis : industrielle, brutale, sans grâce." },
+  { id: "carthag", word: "Carthag", group: "lieux", def: "Ville bâtie par les Harkonnen au nord-est d'Arrakeen pendant leur mandat sur Arrakis : industrielle, brutale, sans grâce." },
   { id: "mur-du-bouclier", word: "Mur du Bouclier", group: "lieux", def: "Chaîne de montagnes qui protège Arrakeen et les terres habitées du nord des grandes tempêtes du désert profond." },
   { id: "sietch-tabr", word: "Sietch Tabr", group: "lieux", def: "Le sietch le plus connu des récits : communauté du nord du désert et point de départ de la révolte fremen." },
   { id: "desert-profond", word: "Désert profond", group: "lieux", def: "Les étendues au sud du Mur du Bouclier, hors de portée des cartes officielles : territoire des grandes tempêtes, des vers et des Fremen." },

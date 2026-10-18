@@ -58,7 +58,7 @@ export const SCENES_CONTENT: Scene[] = [
     epigraph: { text: "Une pincée de cannelle, dit-on. Puis un empire entier qui ne peut plus s'en passer.", sign: SIGN },
     paragraphs: [
       "L'[[epice|épice]] prolonge la vie, ouvre l'esprit, et permet aux [[navigateur|Navigateurs]] de la Guilde de replier l'espace sans jeter leurs vaisseaux dans une étoile. Elle n'existe que sur Arrakis, où elle naît du cycle des [[ver|vers des sables]].",
-      "Qui tient Arrakis tient l'[[imperium|Imperium]]. Voilà toute l'histoire de Dune, et la raison pour laquelle une famille, les [[atreides|Atréides]], y fut envoyée pour y périr.",
+      "Qui tient Arrakis tient l'[[imperium|Imperium]]. Voilà toute l'histoire de Dune, et la raison pour laquelle une famille, les [[atreides|Atréides]], y fut envoyée pour périr.",
     ],
   },
   {

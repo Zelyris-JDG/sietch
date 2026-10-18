@@ -120,7 +120,7 @@ export const EXPANDED: Cycle[] = [
   { name: "Legends of Dune", years: "2002 – 2004", books: ["The Butlerian Jihad", "The Machine Crusade", "The Battle of Corrin"], text: "Dix mille ans plus tôt : la guerre contre les machines pensantes et la naissance des grandes institutions." },
   { name: "Suites de Frank Herbert", years: "2006 – 2007", books: ["Hunters of Dune", "Sandworms of Dune"], text: "La conclusion du cycle, écrite d'après les notes laissées par Frank Herbert." },
   { name: "Heroes of Dune", years: "2008 – 2023", books: ["Paul of Dune", "The Winds of Dune", "Princess of Dune"], text: "Des récits intercalés entre les romans originaux." },
-  { name: "Great Schools of Dune", years: "2011 – 2016", books: ["Sisterhood of Dune", "Mentats of Dune", "Navigators of Dune"], text: "La fondation des grandes écoles : c'est le cycle dont s'inspire la série Dune: Prophecy." },
+  { name: "Great Schools of Dune", years: "2012 – 2016", books: ["Sisterhood of Dune", "Mentats of Dune", "Navigators of Dune"], text: "La fondation des grandes écoles : c'est le cycle dont s'inspire la série Dune: Prophecy." },
   { name: "Trilogie de Caladan", years: "2020 – 2022", books: ["The Duke of Caladan", "The Lady of Caladan", "The Heir of Caladan"], text: "Les mois qui précèdent immédiatement Dune, vus de Caladan." },
 ];
 
