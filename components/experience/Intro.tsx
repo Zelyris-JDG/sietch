@@ -10,8 +10,11 @@ type State = "show" | "skip" | "gone";
 export function Intro() {
   const [st, setSt] = useState<State>("show");
   const first = useRef<HTMLButtonElement>(null);
+  const left = useRef(false); // une fois sortie, l'intro n'écoute plus Échap (sinon elle volait le focus à chaque Échap)
 
   const leave = useCallback((withSound: boolean) => {
+    if (left.current) return;
+    left.current = true;
     if (withSound) void setSound(true);
     try { sessionStorage.setItem(storageKeys.introSeen, "1"); } catch { /* privé */ }
     document.documentElement.classList.remove("intro-open");
@@ -26,7 +29,7 @@ export function Intro() {
     if (seen) { setSt("skip"); document.dispatchEvent(new CustomEvent("sietch:enter")); return; }
     document.documentElement.classList.add("intro-open");
     first.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") leave(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !left.current) leave(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [leave]);
