@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Epigraph } from "../components/ui/Epigraph";
-import "./not-found.css";
 
 export const metadata: Metadata = { title: "Hors des cartes", description: "Cette adresse ne mène nulle part sur Arrakis : revenez à la descente ou ouvrez le lexique." };
 

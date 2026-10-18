@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LexiqueExplorer } from "./LexiqueExplorer";
-import "./lexique.css";
 
 export const metadata: Metadata = { title: "Lexique", description: "Les mots de l'univers de Dune, définis en quelques lignes : lieux, peuples, objets, pouvoirs, histoire." };
 
