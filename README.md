@@ -21,6 +21,9 @@ pnpm typecheck && pnpm lint && pnpm test && pnpm build
 BASE_URL=http://127.0.0.1:3100 pnpm test:e2e      # Playwright (serveur de production lancé à part)
 node scripts/captures.mjs --label=<nom> --wait=4000   # captures bureau + mobile dans docs/captures/<nom>/ (--only=desert,epice --view=bureau)
 node scripts/diag-contraste.mjs --url="http://127.0.0.1:3100/?ciel=jour"   # contraste des textes sur le monde rendu (sans le halo)
+node scripts/diag-ver-tremble.mjs <sortie.png>      # le monde reste en place pendant le tremblement du ver
+node scripts/diag-intro.mjs                         # pas d'éclair de l'intro au retour d'une page
+node scripts/diag-lcp.mjs                           # LCP réel dans Chromium (processeur ralenti × 4)
 ```
 
 ## Structure
