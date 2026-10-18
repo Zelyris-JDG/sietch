@@ -181,13 +181,13 @@ main { position: relative; z-index: 1; }
 /* ---- Console (HUD) ------------------------------------------------------------ */
 .hud { position: fixed; z-index: 20; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; color: var(--amber); pointer-events: none; }
 .hud a, .hud button { pointer-events: auto; }
-.hud--alt { left: calc(var(--gutter) - 12px); top: max(10px, env(safe-area-inset-top)); display: grid; gap: 4px; padding: 10px 12px; background: rgba(11, 9, 8, 0.72); border: 1px solid rgba(242, 181, 68, 0.12); opacity: 0; transform: translateY(-6px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+.hud--alt { left: calc(var(--gutter) - 12px); top: max(10px, env(safe-area-inset-top)); display: grid; gap: 4px; padding: 10px 12px; background: rgba(11, 9, 8, 0.86); border: 1px solid rgba(242, 181, 68, 0.12); opacity: 0; transform: translateY(-6px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
 html[data-descent="on"] .hud--alt { opacity: 1; transform: none; }
 .hud__label { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.22em; }
 .hud__value { font-size: clamp(1rem, 1.6vw, 1.35rem); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }
 .hud__phase { font-size: 0.62rem; letter-spacing: 0.22em; color: var(--sand-dim); }
 .hud--tools { right: var(--gutter); top: max(14px, env(safe-area-inset-top)); display: flex; gap: 6px; align-items: center; }
-.hud-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); background: rgba(11, 9, 8, 0.55); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; transition: border-color 200ms, background 200ms; }
+.hud-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); background: rgba(11, 9, 8, 0.82); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; transition: border-color 200ms, background 200ms; }
 .hud-btn:hover { border-color: var(--accent); }
 .hud-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 .hud-btn__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }

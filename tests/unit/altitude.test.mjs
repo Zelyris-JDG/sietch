@@ -40,5 +40,5 @@ test("formatage lisible", () => {
   assert.equal(formatAltitude(12_000), "12,0 KM");
   assert.equal(formatAltitude(2_130), "2,13 KM");
   assert.equal(formatAltitude(640), "640 M");
-  assert.equal(formatAltitude(-40), "40 M SOUS LE ROC");
+  assert.equal(formatAltitude(-40), "−40 M");
 });
