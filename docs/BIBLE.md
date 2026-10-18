@@ -112,4 +112,5 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 - C2 : brancher ces images (déclaration `src/config/media.ts`, conversion AVIF/WebP, replis image des scènes et de la carte) — en V1 rien ne les lit encore.
 - Johan : vérifier sur son téléphone (Android) : fluidité de la descente, le son (nappe, vent, grondement), « marcher sans rythme » au doigt, la lisibilité du héro sur le vaisseau, les infobulles au toucher, le menu des onglets de la console.
 - Johan : cliquer une fois chaque lien officiel de la console (H5) et relire les mentions légales en ligne (H4).
+- Johan : un passage sur Safari (iPhone ou Mac) et Firefox si possible — seule Chromium était disponible dans la session (bureau, téléphone émulé, clavier, tactile par CDP) ; WebKit et Gecko n'ont pas été exécutés.
 - C2 (suggestions) : éclairage et détails du long-courrier (ombres portées, feux animés), raccord plus doux tempête → dunes, pied de page WebGL (lunes dans le monde), version anglaise, mesure LCP réelle sur préversion, image de partage mise à jour.
