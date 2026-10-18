@@ -63,8 +63,8 @@ button.ticker:hover { background: rgba(242, 181, 68, 0.11); }
 /* ---- Repère « vous êtes ici » de la chronologie ------------------------------------------------------- */
 .timeline li[data-here="true"] { background: linear-gradient(to right, rgba(242, 181, 68, 0.1), rgba(242, 181, 68, 0)); margin-left: -18px; padding-left: 36px; }
 .timeline li[data-here="true"]::before { left: -6px; background: var(--amber); box-shadow: 0 0 0 4px rgba(242, 181, 68, 0.25); }
-.timeline__here { display: inline-flex; align-items: center; gap: 8px; width: max-content; max-width: 100%; padding: 4px 10px; border: 1px solid var(--amber); font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
-.timeline__here i { width: 6px; height: 6px; background: var(--amber); transform: rotate(45deg); }
+.timeline .timeline__here { display: inline-flex; align-items: center; gap: 8px; width: max-content; max-width: 100%; padding: 4px 10px; border: 1px solid var(--amber); font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.timeline .timeline__here i { width: 6px; height: 6px; flex: 0 0 auto; background: var(--amber); transform: rotate(45deg); }
 
 @media (forced-colors: active) {
   .guide__opt[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
