@@ -14,8 +14,9 @@
   -webkit-mask-image: radial-gradient(75% 65% at 28% 32%, #000 0%, transparent 100%);
   mask-image: radial-gradient(75% 65% at 28% 32%, #000 0%, transparent 100%);
 }
-.nf__index { margin: 0; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
-.nf .nf__epigraph { margin: 1.6rem 0 2.2rem; font-size: clamp(1.35rem, 2.6vw, 2.1rem); }
+.nf__index { display: flex; align-items: center; gap: 0.55em; margin: 0; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.nf__nul { flex: none; }
+.nf .nf__epigraph { margin: 1.6rem 0 2.2rem; max-width: 28ch; font-size: clamp(1.35rem, 2.6vw, 2.1rem); }
 .nf__readout { display: grid; gap: 6px; width: max-content; max-width: 100%; margin: 0 0 2rem; padding: 14px 16px; border: 1px solid rgba(242, 181, 68, 0.28); background: rgba(6, 5, 4, 0.9); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
 .nf__readout div { display: flex; flex-wrap: wrap; gap: 0 10px; }
 .nf__readout dt { color: var(--muted); }

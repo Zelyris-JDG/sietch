@@ -4,6 +4,7 @@
 .lexique { margin: 2.4rem 0 0; border: 1px solid rgba(242, 181, 68, 0.28); background: rgba(6, 5, 4, 0.9); font-family: var(--font-mono); color: var(--text); }
 .lexique__bar { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid rgba(242, 181, 68, 0.22); font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); }
 .lexique__bar b { font-weight: 500; }
+.lexique__nowrap { white-space: nowrap; }
 .lexique__blink { display: inline-block; width: 7px; height: 11px; margin-left: 6px; background: var(--amber); vertical-align: -1px; animation: lexique-blink 1.1s steps(2) infinite; }
 @keyframes lexique-blink { to { opacity: 0; } }
 
@@ -42,6 +43,7 @@
   .lexique__bar, .lexique__search, .lexique__filters, .lexique__status { padding-left: 14px; padding-right: 14px; }
   .lexique__filter { flex: 1 1 auto; justify-content: space-between; }
   .lexique__reset { flex: 1 1 100%; }
+  .lexique__hint { display: none; } /* l'indication est reprise dans le message « aucun terme » */
 }
 @media (forced-colors: active) {
   .lexique__filter[aria-pressed="true"] { outline: 2px solid CanvasText; outline-offset: -5px; }

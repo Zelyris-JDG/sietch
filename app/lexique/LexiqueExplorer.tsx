@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { TERMS, TERM_GROUPS, type Term } from "../../src/content/lexique";
+import { TERMS, TERM_BY_ID, TERM_GROUPS, type Term } from "../../src/content/lexique";
 
 type GroupFilter = "tous" | Term["group"];
 
@@ -65,7 +65,7 @@ function highlight(text: string, words: string[]): ReactNode {
 }
 
 function countLabel(n: number, filtered: boolean): string {
-  return `${n} ${n === 1 ? "terme affiché" : "termes affichés"}${filtered ? ` sur ${TERMS.length}` : ""}`;
+  return `${n} ${n <= 1 ? "terme affiché" : "termes affichés"}${filtered ? ` sur ${TERMS.length}` : ""}`;
 }
 
 /**
@@ -99,15 +99,32 @@ export function LexiqueExplorer() {
     inputRef.current?.focus();
   };
 
+  // Ancre posée pendant la consultation (#arrakis, #g-lieux) : si la cible est masquée par un filtre, on lève les filtres
+  // puis on défile jusqu'à elle. Au chargement, tout est affiché : le navigateur fait le travail seul.
+  useEffect(() => {
+    const onHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id || (!TERM_BY_ID[id] && !TERM_GROUPS.some((g) => `g-${g.id}` === id))) return;
+      setQuery("");
+      setGroup("tous");
+      window.requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView());
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
   return (
     <>
       <section className="lexique" aria-label="Recherche et filtres du lexique">
         <div className="lexique__bar">
           <span>
-            <b>Console Mentat</b> · lexique · {TERMS.length} entrées
-            <span className="lexique__blink" aria-hidden="true" />
+            <b>Console Mentat</b> · lexique ·{" "}
+            <span className="lexique__nowrap">
+              {TERMS.length} entrées
+              <span className="lexique__blink" aria-hidden="true" />
+            </span>
           </span>
-          <span>Accents et majuscules indifférents</span>
+          <span className="lexique__hint">Accents et majuscules indifférents</span>
         </div>
         <form className="lexique__search" role="search" onSubmit={(e) => e.preventDefault()}>
           <label htmlFor={inputId} className="lexique__label">Chercher un mot</label>
@@ -126,7 +143,7 @@ export function LexiqueExplorer() {
                   setQuery("");
                 }
               }}
-              placeholder="arrakis, épice, ver des sables…"
+              placeholder="arrakis, épice, ver…"
               autoComplete="off"
               spellCheck={false}
               enterKeyHint="search"
