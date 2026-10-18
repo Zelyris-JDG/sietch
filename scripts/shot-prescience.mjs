@@ -1,7 +1,8 @@
 import { chromium } from "@playwright/test";
 const out = process.argv[2] ?? "/tmp/prescience.png";
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const mobile = process.argv[3] === "mobile"; // node scripts/shot-prescience.mjs <sortie.png> [mobile]
+const page = await browser.newPage(mobile ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 } : { viewport: { width: 1440, height: 900 } });
 await page.goto("http://127.0.0.1:3100/", { waitUntil: "networkidle" });
 await page.getByRole("button", { name: "Entrer en silence" }).click();
 await page.evaluate(() => { const el = document.getElementById("prescience"); window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + 200, behavior: "instant" }); });

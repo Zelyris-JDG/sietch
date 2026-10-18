@@ -384,6 +384,7 @@ html[data-motion="reduce"] .scene__sticky { position: relative; }
   .hud--alt { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); left: var(--gutter); padding: 6px 10px; gap: 0; }
   .hud__label, .hud__phase { display: none; }
   .hud__value { font-size: 0.88rem; }
+  .toast { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 60px); } /* au-dessus de la plaque d'altitude */
   .descent-veil { background: linear-gradient(to top, rgba(11, 9, 8, 0.8) 0%, rgba(11, 9, 8, 0.56) 35%, rgba(11, 9, 8, 0.42) 65%, rgba(11, 9, 8, 0.44) 100%); }
   .epigraph { font-size: 1.45rem; }
   .monument { letter-spacing: 0.22em; }
