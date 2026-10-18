@@ -37,6 +37,8 @@ export function ArrakisMap() {
               transform={`translate(${p.x} ${p.y})`}
               onClick={() => setSel(p.id)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(p.id); } }}>
+              {/* zone de toucher invisible : ≈ 30 px sur téléphone (WCAG 2.5.8), sans chevauchement entre lieux voisins */}
+              <circle className="map__hit" r="26" />
               <circle className="map__ring" r="9" />
               <circle r={p.kind === "Région" || p.kind === "Calotte" ? 7 : 5} />
               <text x="12" y="4">{p.name}</text>

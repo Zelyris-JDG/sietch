@@ -281,11 +281,12 @@ html[data-intro="seen"] .intro { display: none; } /* intro déjà vue dans la se
 @media (min-width: 900px) { .map { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
 .map__svg { width: 100%; height: auto; border: 1px solid rgba(242, 181, 68, 0.2); background: #080605; }
 .map__spot { cursor: pointer; }
-.map__spot circle { fill: rgba(242, 181, 68, 0.12); stroke: var(--amber); stroke-width: 1; transition: fill 200ms, r 200ms; }
-.map__spot:hover circle, .map__spot:focus-visible circle, .map__spot[aria-pressed="true"] circle { fill: rgba(242, 181, 68, 0.55); }
+.map__spot circle:not(.map__hit) { fill: rgba(242, 181, 68, 0.12); stroke: var(--amber); stroke-width: 1; transition: fill 200ms, r 200ms; }
+.map__spot .map__hit { fill: transparent; stroke: none; pointer-events: all; }
+.map__spot:hover circle:not(.map__hit), .map__spot:focus-visible circle:not(.map__hit), .map__spot[aria-pressed="true"] circle:not(.map__hit) { fill: rgba(242, 181, 68, 0.55); }
 .map__spot:focus-visible { outline: none; }
-.map__spot:focus-visible circle { stroke-width: 2; }
-.map__spot text { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; fill: var(--sand-light); text-transform: uppercase; pointer-events: none; }
+.map__spot:focus-visible circle:not(.map__hit) { stroke-width: 2; }
+.map__spot text { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; fill: var(--sand-light); text-transform: uppercase; pointer-events: all; }
 .map__ring { fill: none; stroke: var(--amber); stroke-width: 1; opacity: 0; transition: opacity 200ms; }
 .map__spot[aria-pressed="true"] .map__ring { opacity: 0.9; animation: ring 1.8s ease-out infinite; }
 @keyframes ring { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(2.2); opacity: 0; } }
