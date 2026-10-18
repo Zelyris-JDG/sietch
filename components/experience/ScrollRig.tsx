@@ -48,15 +48,23 @@ export function ScrollRig() {
     };
     document.addEventListener("click", onClick);
 
-    // Apparitions : jamais sur le héro (élément LCP), jamais en mouvement réduit.
+    // Apparitions : jamais sur le héro (élément LCP), jamais en mouvement réduit. Opacité seulement (jamais
+    // visibility: hidden) : le contenu reste atteignable au clavier, et le focus achève l'apparition.
     const reveals: gsap.core.Tween[] = [];
+    const revealOf = new Map<Element, gsap.core.Tween>();
     if (!reduce) {
       document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
-        reveals.push(
-          gsap.fromTo(el, { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 1.2, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 88%", once: true } }),
-        );
+        const tween = gsap.fromTo(el, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 1.2, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+        reveals.push(tween);
+        revealOf.set(el, tween);
       });
     }
+    const onFocusIn = (e: FocusEvent) => {
+      const host = (e.target as HTMLElement).closest?.("[data-reveal]");
+      const tween = host ? revealOf.get(host) : undefined;
+      if (tween && tween.progress() < 1) tween.progress(1);
+    };
+    document.addEventListener("focusin", onFocusIn);
 
     // Rythme du pas : on écoute les gestes (molette, doigt, clavier), pas le défilement lissé.
     const steps: { t: number; d: number }[] = [];
@@ -174,6 +182,7 @@ export function ScrollRig() {
       lenis?.destroy();
       reveals.forEach((t) => { t.scrollTrigger?.kill(); t.kill(); });
       document.removeEventListener("click", onClick);
+      document.removeEventListener("focusin", onFocusIn);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);

@@ -76,6 +76,7 @@ export default function Home() {
       <Footer />
       <WormToast />
       <div className="veil" aria-hidden="true" />
+      <div className="grain" aria-hidden="true" />
     </>
   );
 }

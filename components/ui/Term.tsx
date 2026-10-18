@@ -56,7 +56,7 @@ export function Term({ id, children }: { id: string; children?: React.ReactNode 
       }}
     >
       {children ?? term.word}
-      <span role="tooltip" id={tipId} className="term__tip">
+      <span role="tooltip" id={tipId} className="term__tip" aria-hidden="true">
         <b>{term.word}</b>
         {term.def}
       </span>

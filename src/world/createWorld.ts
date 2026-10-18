@@ -307,6 +307,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   const t0 = performance.now();
   let smoothWorm = 0;
   let prescienceBlend = 0;
+  let frameNo = 0;
 
   const onLost = (e: Event) => { e.preventDefault(); lost = true; };
   const onRestored = () => { lost = false; };
@@ -317,9 +318,13 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     if (!running) return;
     raf = requestAnimationFrame(frame);
     if (document.hidden || lost) return;
+    const p = state.progress;
+    // Sous le roc, rien ne bouge que des poussières : une image sur deux suffit (batterie).
+    const underground = p.desert >= 0.999 && p.epice >= 0.999;
+    frameNo++;
+    if (underground && (frameNo & 1) === 1) return;
     const now = performance.now();
     const time = (now - t0) / 1000;
-    const p = state.progress;
     const o = p.orbite, e = p.entree, d = p.desert, s = p.epice;
     const dark = Math.max(p.maisons, p.sietch, p.prescience, p.fin);
     smoothWorm += (state.worm - smoothWorm) * 0.06;
