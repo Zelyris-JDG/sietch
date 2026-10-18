@@ -175,6 +175,10 @@ main { position: relative; z-index: 1; }
 /* Voiles de lisibilité (jamais de flou) */
 .scene__veil { display: none; }
 .descent-veil { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to right, rgba(11, 9, 8, 0.36) 0%, rgba(11, 9, 8, 0.24) 40%, rgba(11, 9, 8, 0) 68%), linear-gradient(to top, rgba(11, 9, 8, 0.66) 0%, rgba(11, 9, 8, 0.32) 38%, rgba(11, 9, 8, 0.08) 64%, rgba(11, 9, 8, 0.18) 100%); } /* C2 : colonne gauche un peu plus voilée (indice et signature du désert en plein jour mesurés à 3,3 et 4,3 sans le halo) */
+/* Ombre portée douce derrière chaque bloc de texte des scènes sur monde rendu (entrée, désert, épice) : le fond
+   mesuré sous le texte baisse d'un tiers même sur une crête de dune en plein jour, sans couture ni boîte (bords fondus). */
+.scene__sticky .scene__head, .scene__sticky .scene__body { position: relative; }
+.scene__sticky .scene__head::before, .scene__sticky .scene__body::before { content: ""; position: absolute; inset: -14% -10%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, rgba(11, 9, 8, 0.55) 0%, rgba(11, 9, 8, 0.38) 40%, rgba(11, 9, 8, 0.12) 68%, rgba(11, 9, 8, 0) 82%); }
 /* Halo serré + halo large : le texte clair reste lisible sur le sable du plein jour (mesure : scripts/diag-contraste.mjs). */
 .scene__sticky, .hero { text-shadow: 0 0 2px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.75), 0 0 24px rgba(0, 0, 0, 0.62); } /* C2 : halo un peu plus dense (crêtes de dunes en plein jour sous les textes du désert) */
 .scene__sticky .scene__index, .hero .scene__index, .scene__sticky .epigraph cite, .hero .epigraph cite { color: var(--text); }
