@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrakisMap } from "./ArrakisMap";
 import { BooksPanel, FilmsPanel, GamePanel, NetworksPanel, TimelinePanel } from "./panels";
+import { PartThreeTicker } from "./PartThreeCountdown";
 import { DATA_VERIFIED_LABEL } from "../../src/content/sietch";
+import "./sietch.css";
 
 const TABS = [
   { id: "jeu", label: "Dune: Awakening" },
@@ -44,6 +46,7 @@ export function Console() {
         <span><b>CONSOLE MENTAT</b> · refuge souterrain · accès libre<span className="console__blink" aria-hidden="true" /></span>
         <span>DONNÉES VÉRIFIÉES · {DATA_VERIFIED_LABEL.toUpperCase()}</span>
       </div>
+      <PartThreeTicker onOpen={() => { setTab("films"); refs.current.films?.focus(); }} />
       <div className="console__tabs" role="tablist" aria-label="Rubriques du Sietch">
         {TABS.map((t, i) => (
           <button

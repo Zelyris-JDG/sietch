@@ -1,5 +1,14 @@
-import { EXPANDED, FILMS, GAME, NETWORKS, NOVELS, READING_GUIDE, BOOK_LINKS, TIMELINE } from "../../src/content/sietch";
+import { EXPANDED, FILMS, GAME, NETWORKS, NOVELS, PART_THREE, READING_GUIDE, BOOK_LINKS, TIMELINE } from "../../src/content/sietch";
 import { Out } from "../ui/Out";
+import { PartThreeCount } from "./PartThreeCountdown";
+import { ReadingGuide } from "./ReadingGuide";
+
+/** « Par où commencer » du jeu : trois portes déjà liées dans GAME.links (aucun nouveau lien), un conseil original par porte. */
+const GAME_START: { label: string; title: string; text: string }[] = [
+  { label: "Site officiel", title: "Le site officiel", text: "Le point de départ : plateformes, éditions, actualités et liens vers tout le reste. Une visite avant d’acheter." },
+  { label: "Steam", title: "La fiche Steam", text: "Le jeu sur PC : configuration requise, avis des joueurs, achat. C’est aussi là que vivent les forums." },
+  { label: "Discord officiel", title: "Le Discord officiel", text: "Des joueurs pour vos premières heures sur Arrakis, et l’entraide au fil des questions." },
+];
 
 export function FilmsPanel() {
   return (
@@ -19,6 +28,7 @@ export function FilmsPanel() {
                 </div>
               ))}
             </dl>
+            {f.id === PART_THREE.filmId && <PartThreeCount />}
             <p className="card__p">{f.text}</p>
             {f.links.length > 0 && (
               <div className="card__links">
@@ -35,13 +45,17 @@ export function FilmsPanel() {
 export function BooksPanel() {
   return (
     <>
-      <p className="console__intro">Six romans de Frank Herbert, un univers étendu de Brian Herbert et Kevin J. Anderson, et un conseil simple : commencer par le début.</p>
-      <p className="card__k" style={{ marginBottom: 10 }}>Par où commencer</p>
-      <ol className="steps">
-        {READING_GUIDE.map((s) => (
-          <li key={s.title}><div><b>{s.title}</b><span>{s.text}</span></div></li>
-        ))}
-      </ol>
+      <p className="console__intro">Six romans de Frank Herbert, un univers étendu de Brian Herbert et Kevin J. Anderson — et trois questions pour savoir par où commencer.</p>
+      <p className="card__k" style={{ marginBottom: 10 }}>Par où commencer · trois questions</p>
+      <ReadingGuide />
+      <details className="guide__classic">
+        <summary>Le parcours classique, en cinq étapes</summary>
+        <ol className="steps">
+          {READING_GUIDE.map((s) => (
+            <li key={s.title}><div><b>{s.title}</b><span>{s.text}</span></div></li>
+          ))}
+        </ol>
+      </details>
       <p className="card__k" style={{ margin: "26px 0 10px" }}>Les six romans de Frank Herbert</p>
       <div className="console__grid console__grid--3">
         {NOVELS.map((n) => (
@@ -75,7 +89,7 @@ export function GamePanel() {
   return (
     <>
       <p className="console__intro">{GAME.pitch}</p>
-      <div className="console__grid">
+      <div className="console__grid console__grid--3">
         <article className="card card--featured">
           <span className="card__k">{GAME.studio} · {GAME.genre}</span>
           <h3 className="card__t">{GAME.title}</h3>
@@ -90,6 +104,23 @@ export function GamePanel() {
           <div className="card__links">
             {GAME.links.map((l) => <Out key={l.href} href={l.href}>{l.label}</Out>)}
           </div>
+        </article>
+        <article className="card">
+          <span className="card__k">Par où commencer</span>
+          <ol className="start">
+            {GAME_START.map((s) => {
+              const link = GAME.links.find((l) => l.label === s.label);
+              if (!link) return null;
+              return (
+                <li key={s.label}>
+                  <div>
+                    <Out href={link.href}>{s.title}</Out>
+                    <p className="card__p">{s.text}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </article>
         <article className="card">
           <span className="card__k">À savoir</span>
@@ -145,12 +176,13 @@ export function NetworksPanel() {
 export function TimelinePanel() {
   return (
     <>
-      <p className="console__intro">Dix mille ans en onze repères, du Jihad butlérien à la Maison des Mères. Années du calendrier de la Guilde ; le signe ≈ marque une estimation d’après les appendices des romans.</p>
+      <p className="console__intro">Dix mille ans en onze repères, du Jihad butlérien à la Maison des Mères. Années du calendrier de la Guilde ; le signe ≈ marque une estimation d’après les appendices des romans. Le repère « vous êtes ici » est l’année du roman Dune — celle des deux premiers films.</p>
       <p className="timeline__scale">av. G. = avant la Guilde · ap. G. = après la fondation de la Guilde</p>
       <ol className="timeline">
         {TIMELINE.map((e) => (
-          <li key={e.title} data-key={e.key ? "true" : undefined}>
+          <li key={e.title} data-key={e.key ? "true" : undefined} data-here={e.here ? "true" : undefined}>
             <time>{e.when}</time>
+            {e.here && <span className="timeline__here"><i aria-hidden="true" />Vous êtes ici · l’année de Dune</span>}
             <b>{e.title}</b>
             <span>{e.text}</span>
           </li>
