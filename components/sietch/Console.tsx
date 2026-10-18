@@ -6,7 +6,6 @@ import type { MediaPaths } from "../../src/config/media";
 import { BooksPanel, FilmsPanel, GamePanel, NetworksPanel, TimelinePanel } from "./panels";
 import { PartThreeTicker } from "./PartThreeCountdown";
 import { DATA_VERIFIED_LABEL } from "../../src/content/sietch";
-import "./sietch.css";
 
 const TABS = [
   { id: "jeu", label: "Dune: Awakening" },

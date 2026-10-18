@@ -5,7 +5,6 @@ import { useState } from "react";
 import { PLACES } from "../../src/content/sietch";
 import { MEDIA_BY_ID, type MediaId, type MediaPaths } from "../../src/config/media";
 import { Term } from "../ui/Term";
-import "../world/media.css";
 
 /** Lieu → image de docs/medias.md montrée en vignette dans sa fiche, quand le fichier existe (emplacements 7, 8 et 11). */
 const PLACE_MEDIA: Partial<Record<string, MediaId>> = {

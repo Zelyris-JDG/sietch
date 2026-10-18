@@ -1,5 +1,4 @@
 import Image from "next/image";
-import "../world/media.css";
 
 /**
  * Fond d'image décoratif d'une section (emplacements 5 « L'épice » et 10 « Le Sietch » de docs/medias.md).

@@ -4,7 +4,6 @@ import Image, { getImageProps } from "next/image";
 import { useEffect, useState } from "react";
 import { SCENES, type SceneId } from "../../src/lib/store";
 import type { MediaId, MediaPaths } from "../../src/config/media";
-import "./media.css";
 
 /**
  * Monde « calme » : des couches fixes (dégradés, dunes en SVG) qui se fondent selon la scène courante
