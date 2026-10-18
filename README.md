@@ -19,7 +19,7 @@ Paramètres d'adresse utiles pour tester : `?ciel=jour|crepuscule|nuit` (ciel r�
 ```bash
 pnpm typecheck && pnpm lint && pnpm test && pnpm build
 BASE_URL=http://127.0.0.1:3100 pnpm test:e2e      # Playwright (serveur de production lancé à part)
-node scripts/captures.mjs --label=<nom>           # captures bureau + mobile dans docs/captures/<nom>/
+node scripts/captures.mjs --label=<nom> --wait=4000   # captures bureau + mobile dans docs/captures/<nom>/ (--only=desert,epice --view=bureau)
 ```
 
 ## Structure
