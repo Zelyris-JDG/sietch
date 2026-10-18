@@ -52,7 +52,7 @@ a { color: inherit; text-decoration-color: var(--line-strong); text-underline-of
 a:hover { text-decoration-color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
-button, [role="button"] { user-select: none; }
+button, [role="button"] { -webkit-user-select: none; user-select: none; } /* Safari ne lit que la forme préfixée */
 img, svg, canvas { display: block; max-width: 100%; }
 p { margin: 0 0 1em; max-width: var(--measure); }
 h1, h2, h3, h4 { margin: 0; font-weight: 500; line-height: 1.1; }
@@ -110,6 +110,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
   cursor: help;
+  -webkit-user-select: text;
   user-select: text;
   border-radius: 2px;
 }
@@ -213,7 +214,7 @@ html[data-descent="on"] .hud--alt { opacity: 1; transform: none; }
 /* ---- Intro ---------------------------------------------------------------------- */
 /* L'intro tient dans n'importe quel écran : grille + marges automatiques (centrée quand il y a de la place, alignée en
    haut et défilable sinon — téléphone à l'horizontale, petite fenêtre), jamais de bouton hors écran. */
-.intro { position: fixed; inset: 0; z-index: 50; background: var(--basalt); display: grid; overflow-y: auto; text-align: center; padding: var(--gutter); transition: opacity 900ms var(--ease-out), visibility 0s linear 900ms; }
+.intro { position: fixed; inset: 0; z-index: 50; background: var(--basalt); display: grid; overflow-y: auto; overscroll-behavior: contain; text-align: center; padding: var(--gutter); transition: opacity 900ms var(--ease-out), visibility 0s linear 900ms; } /* overscroll-behavior : sur iOS, `overflow: hidden` sur html ne bloque pas le défilement au doigt ; l'intro ne transmet pas son dépassement à la page derrière elle */
 .intro__inner { margin: auto; }
 @media (max-height: 600px) { .intro__inner { gap: 1rem; } .intro__breath { height: 28px; } }
 /* Écran bas (téléphone à l'horizontale, petite fenêtre) : la plaque d'altitude passe en bas à gauche, compacte,

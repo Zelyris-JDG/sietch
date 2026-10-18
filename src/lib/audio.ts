@@ -12,6 +12,11 @@ export class Ambience {
   private nodes: AudioNode[] = [];
   running = false;
 
+  /** Le contexte produit-il vraiment du son (état « running ») ? Faux si Safari l'a suspendu ou interrompu. */
+  get live(): boolean {
+    return this.ctx?.state === "running";
+  }
+
   private noiseBuffer(kind: "white" | "brown"): AudioBuffer {
     const ctx = this.ctx!;
     const len = ctx.sampleRate * 3;
@@ -104,7 +109,11 @@ export class Ambience {
       this.rumbleGain = rumbleGain;
       this.nodes.push(rumble);
     }
-    if (this.ctx.state === "suspended") await this.ctx.resume();
+    // Safari (iOS) connaît un troisième état, « interrupted » (appel, Siri, autre onglet qui joue) : on reprend dès que
+    // le contexte n'est pas « running », et un refus (reprise hors d'un geste) ne casse rien — sound.ts réarme au geste suivant.
+    if (this.ctx.state !== "running") {
+      try { await this.ctx.resume(); } catch { /* repris au prochain geste */ }
+    }
     const t = this.ctx.currentTime;
     this.master!.gain.cancelScheduledValues(t);
     this.master!.gain.setValueAtTime(this.master!.gain.value, t);
