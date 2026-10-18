@@ -2,7 +2,7 @@
 
 Mémoire permanente du projet « Sietch — Refuge des fans », chargée par `CLAUDE.md`. Ajout uniquement : on ne réécrit jamais le passé. Au-delà de 250 lignes, les plus anciennes entrées du Journal partent dans `docs/JOURNAL-ARCHIVE.md`.
 
-Chantier en cours : **C1** (18/10/2026). Prochain numéro : C2. Ateliers : A1 (le brief de ce chantier).
+Chantier en cours : **C2** (18/10/2026, passes d'amélioration autonomes jusqu'à 18 h 45, brief donné directement par Johan). Prochain numéro : C3. Ateliers : A1 (le brief de C1).
 
 ## Vision et public visé
 
@@ -83,6 +83,10 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 - **H11 — Altitude.** Échelle narrative : 1 200 km dans la soute, 400 km en sortie d'orbite, 12 km sous les nuages de poussière, 0 sur le sable, −80 m au fond du Sietch (aucune prétention physique).
 - **H12 — Mentions légales et données personnelles.** Le site ne pose aucun cookie et n'a aucune mesure d'audience ; deux préférences (son, message du ver) restent dans le navigateur. À confirmer par Johan si une mesure d'audience est ajoutée plus tard.
 - **H12, précision (18/10/2026, après-midi).** Trois mémorisations en réalité : son, message du ver (durables, `localStorage`) et intro déjà vue (le temps d'une session, `sessionStorage`). La page « Mentions légales » les cite toutes les trois.
+
+- **H13 — Safari et Firefox (C2).** Le téléchargement de WebKit et de Firefox pour Playwright est bloqué par le réseau de la session (403 du proxy sur cdn.playwright.dev et sur le miroir playwright.download.prss.microsoft.com, deux tentatives le 18/10/2026 après-midi) : aucun test n'a pu tourner sur ces moteurs. À la place, contrôle dans le code des pièges connus (backdrop-filter, AudioContext après un geste, repli sans WebGL 2, hauteurs vh/svh/dvh) ; Johan garde le passage sur iPhone, Mac et Firefox.
+- **H14 — Vercel et branches (C2).** Johan a relié un projet Vercel au dépôt le 18/10/2026 : chaque push crée une préversion. La PR n°1 garde pour tête la branche de session `claude/sietch-c1-refuge-fans-kd77dr` (GitHub ne permet pas de changer la tête d'une PR) ; `feat/v1` reçoit exactement les mêmes commits (H1 maintenue). Après chaque push, l'agent vérifie que la préversion se construit.
+- **H15 — Sous-agents (C2).** Le chantier C2 est mené avec des sous-agents en parallèle, chacun dans un arbre de travail git isolé et sur un périmètre de fichiers disjoint (long-courrier ; emplacements d'images ; performance et Safari ; Sietch ; lexique, 404 et checklist ; vérification web des liens et dates). L'agent principal intègre, relit, teste et pousse ; les hypothèses prises par un sous-agent sont reportées ici.
 
 ## Chantiers futurs (NE PAS construire maintenant)
 

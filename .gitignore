@@ -12,3 +12,4 @@ npm-debug.log*
 /playwright-report/
 /test-results/
 /.captures-tmp/
+/.claude/worktrees/

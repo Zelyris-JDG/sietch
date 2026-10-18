@@ -23,7 +23,7 @@ export const SCENES_CONTENT: Scene[] = [
     title: "Le refuge des fans",
     epigraph: { text: "Tout ce qui tombe sur Arrakis finit dans le sable. Le reste apprend à marcher.", sign: SIGN },
     paragraphs: [
-      "Vous êtes dans la soute d'un [[long-courrier]] de la [[guilde|Guilde spatiale]]. Sous vous, la seule planète où naît l'[[epice|épice]]. Autour de vous, des coques plus grandes que des villes, et des feux de position qui n'éclairent rien.",
+      "Vous êtes dans la soute d'un [[long-courrier|long-courrier]] de la [[guilde|Guilde spatiale]]. Sous vous, la seule planète où naît l'[[epice|épice]]. Autour de vous, des coques plus grandes que des villes, et des feux de position qui n'éclairent rien.",
       "Descendez.",
     ],
   },
