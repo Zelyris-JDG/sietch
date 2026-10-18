@@ -79,6 +79,7 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 - **H10 — Marcher sans rythme.** La régularité se mesure sur les gestes (molette, doigt, clavier) des 2,8 dernières secondes, pas sur le défilement lissé ; le ver n'approche que sur le sable (désert, épice) ; message affiché une seule fois (mémorisé), jamais en mouvement réduit.
 - **H11 — Altitude.** Échelle narrative : 1 200 km dans la soute, 400 km en sortie d'orbite, 12 km sous les nuages de poussière, 0 sur le sable, −80 m au fond du Sietch (aucune prétention physique).
 - **H12 — Mentions légales et données personnelles.** Le site ne pose aucun cookie et n'a aucune mesure d'audience ; deux préférences (son, message du ver) restent dans le navigateur. À confirmer par Johan si une mesure d'audience est ajoutée plus tard.
+- **H12, précision (18/10/2026, après-midi).** Trois mémorisations en réalité : son, message du ver (durables, `localStorage`) et intro déjà vue (le temps d'une session, `sessionStorage`). La page « Mentions légales » les cite toutes les trois.
 
 ## Chantiers futurs (NE PAS construire maintenant)
 
