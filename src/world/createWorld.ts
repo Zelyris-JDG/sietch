@@ -372,8 +372,9 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       wantPos.set(-28 + Math.sin(exitT * 1.3) * 5 + orbitT * 20, y, 24 + exitT * 18 + orbitT * 30);
       // Regard : d'abord la coque au-dessus, puis la planète en dessous.
       const look = smoothstep(0.15, 0.9, orbitT);
-      const side = camera.aspect < 0.8 ? -26 : 0; // téléphone : le vaisseau se décale, le texte reste lisible
-      tmp.set(18 + side, 10, -150).lerp(new THREE.Vector3(0, -600, -200), look);
+      const portrait = camera.aspect < 0.8;
+      const side = portrait ? -40 : 0; // téléphone : le regard porte plus à gauche et plus bas, le vaisseau monte à droite, le titre reste dégagé
+      tmp.set(18 + side, portrait ? 2 : 10, -150).lerp(new THREE.Vector3(0, -600, -200), look);
       wantTarget.copy(tmp);
       // Planète : loin et basse au début, elle monte vers nous pendant l'entrée.
       const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60;
