@@ -23,12 +23,15 @@ test.describe("Marcher sans rythme, au doigt", () => {
     });
     await page.waitForTimeout(500);
     const cdp = await page.context().newCDPSession(page);
-    // Cadence régulière : des balayages identiques, un toutes les ≈ 520 ms (plus la latence du protocole), jusqu'à ce
-    // que le ver approche — cinq balayages suffisent au compteur, sept le font approcher ; plafond à quatorze.
+    // Cadence régulière : des balayages identiques, un toutes les ≈ 360 ms plus la latence du protocole (≈ 250 ms, bien
+    // plus sous charge ou avec la trace Playwright), jusqu'à ce que le ver approche — cinq balayages suffisent au
+    // compteur, sept le font approcher ; plafond à seize. La fenêtre de régularité du rail est de 4,5 s : la période
+    // réelle doit rester nettement sous 900 ms, sinon le premier pas sort de la fenêtre avant que le cinquième n'entre
+    // (c'était la cause des échecs sous charge : période mesurée ≈ 1 s, rythme jamais calculé).
     let near = false;
-    for (let i = 0; i < 14 && !near; i++) {
-      await swipe(page, cdp, 120, 120);
-      await page.waitForTimeout(400);
+    for (let i = 0; i < 16 && !near; i++) {
+      await swipe(page, cdp, 120, 100);
+      await page.waitForTimeout(260);
       near = (await page.locator("html").getAttribute("data-worm")) === "near";
     }
     expect(near, "le ver doit approcher après des balayages réguliers").toBe(true);
