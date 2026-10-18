@@ -140,6 +140,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .term__tip::before { content: ""; position: absolute; top: 100%; left: calc(50% - var(--tip-shift, 0px)); width: 10px; height: 10px; margin-left: -5px; margin-top: -5px; background: var(--basalt-2); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); transform: rotate(45deg); }
 .term__tip b { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
+.scene__sticky .term__tip, .hero .term__tip { text-shadow: none; } /* l'infobulle a son propre fond : pas de halo hérité */
 .term:hover > .term__tip, .term:focus-visible > .term__tip, .term[aria-expanded="true"] > .term__tip { opacity: 1; visibility: visible; transition-delay: 0s; }
 .term--below > .term__tip { bottom: auto; top: calc(100% + 10px); }
 .term--below > .term__tip::before { top: auto; bottom: 100%; margin-top: 0; margin-bottom: -5px; transform: rotate(225deg); }
