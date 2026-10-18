@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { StillWorld } from "./StillWorld";
-import { deviceTier, prefersReducedMotion, webglAvailable } from "../../src/lib/prefs";
+import { deviceTier, prefersReducedMotion, webglAvailable, type DeviceTier } from "../../src/lib/prefs";
 import { storageKeys } from "../../src/config/site";
 
 const GlWorld = dynamic(() => import("./GlWorld").then((m) => m.GlWorld), { ssr: false });
@@ -14,7 +14,7 @@ const GlWorld = dynamic(() => import("./GlWorld").then((m) => m.GlWorld), { ssr:
  */
 export function World() {
   const [mode, setMode] = useState<"still" | "gl">("still");
-  const [tier, setTier] = useState<"low" | "high">("high");
+  const [tier, setTier] = useState<DeviceTier>("high");
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("monde") === "calme") return;

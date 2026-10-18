@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { StillWorld } from "./StillWorld";
+import type { DeviceTier } from "../../src/lib/prefs";
 
 /** Monde WebGL : le module three.js n'est chargé qu'ici. En attendant (ou en cas d'échec), la version calme reste visible. */
-export function GlWorld({ tier }: { tier: "low" | "high" }) {
+export function GlWorld({ tier }: { tier: DeviceTier }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);

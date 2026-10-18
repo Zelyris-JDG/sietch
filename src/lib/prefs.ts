@@ -30,7 +30,14 @@ export function skyFromHour(hour: number): "day" | "dusk" | "night" {
  * Niveau de l'appareil : "low" = peu de cœurs, peu de mémoire ou connexion économe → particules réduites,
  * WebGL allégé. Mesuré une seule fois.
  */
-export function deviceTier(): "low" | "high" {
+/**
+ * Trois niveaux de qualité du monde WebGL : « low » (appareil faible, économie de données, réseau lent), « mid »
+ * (tout appareil à pointeur grossier — téléphone, tablette — même puissant : cadence et batterie d'abord),
+ * « high » (ordinateur). Impossible de mesurer la carte graphique : on reste prudent sur les téléphones.
+ */
+export type DeviceTier = "low" | "mid" | "high";
+
+export function deviceTier(): DeviceTier {
   if (typeof navigator === "undefined") return "high";
   const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean; effectiveType?: string } };
   const cores = navigator.hardwareConcurrency ?? 4;
@@ -39,7 +46,8 @@ export function deviceTier(): "low" | "high" {
   const slow = /(^|-)2g$/.test(nav.connection?.effectiveType ?? "");
   const small = Math.min(window.innerWidth, window.innerHeight) < 500;
   if (saveData || slow || cores <= 4 || mem <= 3 || (small && cores <= 6)) return "low";
-  return "high";
+  const coarse = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+  return coarse ? "mid" : "high";
 }
 
 /** three.js (r163 et plus) exige WebGL 2 : sans lui, la version calme. */

@@ -8,7 +8,7 @@ import { state, clamp01, lerp, smoothstep } from "../lib/store";
 import { duneBase } from "./dunes";
 import { DUNE_FRAG, DUNE_VERT, HALO_FRAG, HALO_VERT, HULL_FRAG, HULL_VERT, PARTICLE_FRAG, PARTICLE_VERT, PLANET_FRAG, PLANET_VERT, SKY_FRAG, SKY_VERT, WIND_VERT } from "./shaders";
 
-export type WorldOptions = { tier: "low" | "high" };
+export type WorldOptions = { tier: "low" | "mid" | "high" };
 
 const SKY_WEIGHTS: Record<string, THREE.Vector3> = {
   day: new THREE.Vector3(1, 0, 0),
@@ -48,9 +48,11 @@ function particleGeometry(count: number, box: THREE.Vector3, rand: () => number,
 }
 
 export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): { dispose: () => void } {
+  /* Qualité par niveau d'appareil : ordinateur / téléphone ou tablette / appareil faible. */
+  const pick = <T,>(hi: T, mid: T, lo: T): T => (tier === "high" ? hi : tier === "mid" ? mid : lo);
   const high = tier === "high";
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: high, alpha: false, powerPreference: "high-performance", stencil: false });
-  const pixelRatio = Math.min(window.devicePixelRatio || 1, high ? 1.5 : 1);
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, pick(1.5, 1.25, 1));
   renderer.setPixelRatio(pixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -71,7 +73,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   const space = new THREE.Group();
   scene.add(space);
 
-  const starCount = high ? 3200 : 1100;
+  const starCount = pick(3200, 2000, 1100);
   const starPos = new Float32Array(starCount * 3);
   for (let i = 0; i < starCount; i++) {
     const r = 1400 + rand() * 1200, t = rand() * Math.PI * 2, p = Math.acos(2 * rand() - 1);
@@ -92,7 +94,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     fragmentShader: PLANET_FRAG,
     uniforms: { uSunDir: { value: new THREE.Vector3(-0.6, 0.35, 0.72).normalize() }, uTime: { value: 0 }, uHaze: { value: 0 } },
   }));
-  const planet = new THREE.Mesh(keep(new THREE.SphereGeometry(PLANET_R, high ? 128 : 64, high ? 96 : 48)), planetMat);
+  const planet = new THREE.Mesh(keep(new THREE.SphereGeometry(PLANET_R, pick(128, 96, 64), pick(96, 64, 48))), planetMat);
   planet.rotation.z = 0.35;
   space.add(planet);
   const haloMat = keep(new THREE.ShaderMaterial({
@@ -114,14 +116,14 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     const r = 2 + 12 * Math.sin(Math.PI * t) ** 0.55 + 1.5 * Math.sin(t * 40) * Math.sin(Math.PI * t);
     profile.push(new THREE.Vector2(r, (t - 0.5) * SHIP_L));
   }
-  const spine = new THREE.Mesh(keep(new THREE.LatheGeometry(profile, high ? 48 : 24)), hullMat);
+  const spine = new THREE.Mesh(keep(new THREE.LatheGeometry(profile, pick(48, 32, 24))), hullMat);
   spine.rotation.z = Math.PI / 2; // axe long le long de X
   ship.add(spine);
   // Anneaux de structure : de vrais tores (jamais un tore mis à l'échelle : son tube deviendrait un disque).
   for (let i = 0; i < 5; i++) {
     const t = (i + 0.5) / 5;
     const r = 15 + 9 * Math.sin(Math.PI * t);
-    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, 0.7, 8, high ? 96 : 48)), ribMat);
+    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, 0.7, 8, pick(96, 64, 48))), ribMat);
     ring.position.x = (t - 0.5) * SHIP_L;
     ring.rotation.y = Math.PI / 2;
     ship.add(ring);
@@ -134,7 +136,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       ship.add(strut);
     }
   }
-  const moduleCount = high ? 1400 : 500;
+  const moduleCount = pick(1400, 900, 500);
   const modules = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(1, 1, 1)), keep(new THREE.MeshStandardMaterial({ color: 0x7c6a5a, roughness: 0.8, metalness: 0.15, emissive: 0x120a05 })), moduleCount);
   const dummy = new THREE.Object3D();
   for (let i = 0; i < moduleCount; i++) {
@@ -168,7 +170,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     strip.scale.x = 4 + rand() * 18;
     ship.add(strip);
   }
-  const lightCount = high ? 420 : 160;
+  const lightCount = pick(420, 260, 160);
   const lightPos = new Float32Array(lightCount * 3);
   const lightCol = new Float32Array(lightCount * 3);
   for (let i = 0; i < lightCount; i++) {
@@ -234,7 +236,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   /* ------------------------------------------------------------------ Tempête de poussière */
   /* La poussière suit la lumière du ciel réel : cuivrée le jour, brune au crépuscule, presque éteinte la nuit. */
   const STORM_TINT: Record<string, [number, number, number]> = { day: [0.86, 0.58, 0.30], dusk: [0.78, 0.48, 0.25], night: [0.40, 0.29, 0.20] };
-  const stormCount = high ? 9000 : 2600;
+  const stormCount = pick(9000, 5000, 2600);
   const stormMat = keep(new THREE.ShaderMaterial({
     vertexShader: PARTICLE_VERT, fragmentShader: PARTICLE_FRAG, transparent: true, depthWrite: false,
     uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uSpeed: { value: 55 }, uDir: { value: new THREE.Vector3(1, -0.15, 0.1).normalize() }, uSpan: { value: 180 }, uPixelRatio: { value: pixelRatio }, uColor: { value: new THREE.Color(...(STORM_TINT[skyName] ?? STORM_TINT.night)) } },
@@ -259,12 +261,12 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   }]);
   const duneMat = keep(new THREE.ShaderMaterial({ vertexShader: DUNE_VERT, fragmentShader: DUNE_FRAG, uniforms: duneUniforms, fog: true }));
   const DUNE_SIZE = 900;
-  const dunes = new THREE.Mesh(keep(new THREE.PlaneGeometry(DUNE_SIZE, DUNE_SIZE, high ? 300 : 120, high ? 300 : 120)), duneMat);
+  const dunes = new THREE.Mesh(keep(new THREE.PlaneGeometry(DUNE_SIZE, DUNE_SIZE, pick(300, 200, 120), pick(300, 200, 120))), duneMat);
   dunes.rotation.x = -Math.PI / 2;
   dunes.frustumCulled = false;
   desert.add(dunes);
 
-  const windCount = high ? 2400 : 700;
+  const windCount = pick(2400, 1400, 700);
   const windMat = keep(new THREE.ShaderMaterial({
     vertexShader: WIND_VERT, fragmentShader: PARTICLE_FRAG, transparent: true, depthWrite: false,
     uniforms: { uTime: duneUniforms.uTime, uWorm: duneUniforms.uWorm, uWormPos: duneUniforms.uWormPos, uAlpha: { value: 0 }, uPixelRatio: { value: pixelRatio }, uOrigin: { value: new THREE.Vector3() }, uColor: { value: new THREE.Color(0.96, 0.84, 0.62) } },
@@ -274,7 +276,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   desert.add(wind);
 
   /* ------------------------------------------------------------------ Épice et poussières du Sietch */
-  const spiceCount = high ? 2600 : 900;
+  const spiceCount = pick(2600, 1600, 900);
   const spiceMat = keep(new THREE.ShaderMaterial({
     vertexShader: PARTICLE_VERT, fragmentShader: PARTICLE_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uSpeed: { value: 2.2 }, uDir: { value: new THREE.Vector3(0.15, 1, 0).normalize() }, uSpan: { value: 40 }, uPixelRatio: { value: pixelRatio }, uColor: { value: new THREE.Color(1.0, 0.45, 0.12) } },
