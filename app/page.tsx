@@ -6,7 +6,7 @@ import { Emblem } from "../components/ui/Emblem";
 import { Term } from "../components/ui/Term";
 import { SceneBlock } from "../components/experience/SceneBlock";
 import { Intro } from "../components/experience/Intro";
-import { ScrollRig } from "../components/experience/ScrollRig";
+import { ScrollRigLoader } from "../components/experience/ScrollRigLoader";
 import { Hud } from "../components/experience/Hud";
 import { WormToast } from "../components/experience/WormToast";
 import { PrescienceToggle, Releases } from "../components/experience/Prescience";
@@ -22,7 +22,7 @@ export default function Home() {
     <>
       <Intro />
       <World />
-      <ScrollRig />
+      <ScrollRigLoader />
       <Hud />
       <main id="main" tabIndex={-1}>
         <div className="descent-veil" aria-hidden="true" />
