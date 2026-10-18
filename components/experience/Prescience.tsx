@@ -22,13 +22,19 @@ export function PrescienceToggle() {
   );
 }
 
-const FR_DATE = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+/* Les dates du calendrier sont des jours civils (sans heure) : on les affiche telles quelles, quel que soit le fuseau du visiteur. */
+const FR_DATE = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+function civilDate(iso: string): Date {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
 
 function parts(ms: number): { d: number; h: number; m: number; s: number } {
   const t = Math.max(0, Math.floor(ms / 1000));
   return { d: Math.floor(t / 86400), h: Math.floor((t % 86400) / 3600), m: Math.floor((t % 3600) / 60), s: t % 60 };
 }
 
+/** Cible du compte à rebours : minuit à Paris le jour de la sortie. */
 export function releaseDate(r: Release): Date | null {
   return r.date ? new Date(`${r.date}T00:00:00+01:00`) : null;
 }
@@ -42,7 +48,7 @@ function ReleaseCard({ r, now, on }: { r: Release; now: number | null; on: boole
       <span className="release__k">{r.kind}</span>
       <h3 className="release__t">{r.title}</h3>
       <p className="release__d">
-        {date ? <time dateTime={r.date!}>{FR_DATE.format(date)}</time> : "Date non annoncée"} · {r.where}
+        {r.date ? <time dateTime={r.date}>{FR_DATE.format(civilDate(r.date))}</time> : "Date non annoncée"} · {r.where}
       </p>
       {on && (
         <div className="release__count" data-state={past ? "past" : diff === null ? "unknown" : "future"} aria-label={past ? "Déjà sorti" : undefined}>

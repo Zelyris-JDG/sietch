@@ -15,6 +15,7 @@ export function Intro() {
     if (withSound) void setSound(true);
     try { sessionStorage.setItem(storageKeys.introSeen, "1"); } catch { /* privé */ }
     document.documentElement.classList.remove("intro-open");
+    document.dispatchEvent(new CustomEvent("sietch:enter"));
     setSt("gone");
     window.setTimeout(() => document.getElementById("main")?.focus({ preventScroll: true }), 50);
   }, []);
@@ -22,7 +23,7 @@ export function Intro() {
   useEffect(() => {
     let seen = false;
     try { seen = sessionStorage.getItem(storageKeys.introSeen) === "1"; } catch { /* privé */ }
-    if (seen) { setSt("skip"); return; }
+    if (seen) { setSt("skip"); document.dispatchEvent(new CustomEvent("sietch:enter")); return; }
     document.documentElement.classList.add("intro-open");
     first.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") leave(false); };

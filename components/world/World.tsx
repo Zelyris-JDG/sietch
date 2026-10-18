@@ -18,8 +18,27 @@ export function World() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("monde") === "calme") return;
     if (prefersReducedMotion() || !webglAvailable()) return;
-    setTier(deviceTier());
-    setMode("gl");
+    // Le monde WebGL (three.js) n'est chargé qu'une fois le premier écran peint : à la sortie de l'intro, ou
+    // sinon après le chargement complet et un court temps mort. Rien ne concurrence le texte du héro (LCP).
+    let done = false;
+    let timer = 0;
+    const start = () => {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timer);
+      document.removeEventListener("sietch:enter", start);
+      setTier(deviceTier());
+      setMode("gl");
+    };
+    document.addEventListener("sietch:enter", start);
+    const idle = () => { timer = window.setTimeout(start, 1200); };
+    if (document.readyState === "complete") idle();
+    else window.addEventListener("load", idle, { once: true });
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("sietch:enter", start);
+      window.removeEventListener("load", idle);
+    };
   }, []);
   if (mode === "gl") return <GlWorld tier={tier} />;
   return <StillWorld />;

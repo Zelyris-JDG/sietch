@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { archivo, cormorant, plexMono } from "./fonts";
+import { archivo, cormorant, cormorantRoman, plexMono } from "./fonts";
 import { site } from "../src/config/site";
 import "./globals.css";
 
@@ -27,7 +27,7 @@ const bootScript = `(function(){try{var h=new Date().getHours(),s=(h>=7&&h<17)?"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" data-sky="night" suppressHydrationWarning className={`${archivo.variable} ${cormorant.variable} ${plexMono.variable}`}>
+    <html lang="fr" data-sky="night" suppressHydrationWarning className={`${archivo.variable} ${cormorant.variable} ${cormorantRoman.variable} ${plexMono.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

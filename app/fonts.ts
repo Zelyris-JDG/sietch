@@ -11,16 +11,23 @@ export const archivo = localFont({
   fallback: ["Helvetica Neue", "Arial", "sans-serif"],
 });
 
+/* Les épigraphes sont en italique : seul l'italique est préchargé (élément visible dès le héro) ; le romain
+   n'est téléchargé que s'il sert. */
 export const cormorant = localFont({
-  src: [
-    { path: "../src/fonts/cormorant-garamond-variable-normal.woff2", weight: "300 700", style: "normal" },
-    { path: "../src/fonts/cormorant-garamond-variable-italic.woff2", weight: "300 700", style: "italic" },
-  ],
+  src: [{ path: "../src/fonts/cormorant-garamond-variable-italic.woff2", weight: "300 700", style: "italic" }],
   variable: "--font-cormorant",
   display: "swap",
   preload: true,
   adjustFontFallback: "Times New Roman",
   fallback: ["Georgia", "serif"],
+});
+
+export const cormorantRoman = localFont({
+  src: [{ path: "../src/fonts/cormorant-garamond-variable-normal.woff2", weight: "300 700", style: "normal" }],
+  variable: "--font-cormorant-roman",
+  display: "swap",
+  preload: false,
+  adjustFontFallback: "Times New Roman",
 });
 
 export const plexMono = localFont({

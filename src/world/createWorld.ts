@@ -356,8 +356,10 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       planetMat.uniforms.uTime.value = time;
       planetMat.uniforms.uHaze.value = stormT;
       haloMat.uniforms.uStrength.value = 0.8 + entryT * 0.8;
-      ship.position.set(0, 22 + orbitT * 70, -40 - orbitT * 160);
-      ship.rotation.x = 0.03 + orbitT * 0.08;
+      // En s'éloignant, le vaisseau glisse de côté et pivote : on le voit de trois quarts, jamais de face.
+      ship.position.set(orbitT * 150, 22 + orbitT * 70, -40 - orbitT * 170);
+      ship.rotation.y = Math.PI / 2 + orbitT * 0.85;
+      ship.rotation.x = 0.03 + orbitT * 0.1;
       stars.rotation.y = time * 0.004;
       // Frégates : dérive lente autour de la coque, un feu qui clignote.
       for (let i = 0; i < frigateCount; i++) {

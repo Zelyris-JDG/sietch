@@ -66,7 +66,7 @@ export function Hud() {
           type="button"
           className="hud-btn"
           aria-pressed={sound}
-          aria-label={sound ? "Couper le son" : "Activer le son"}
+          aria-label={sound ? "Son : couper" : "Son coupé : activer"}
           onClick={() => void setSound(!sound)}
         >
           <span className="hud-btn__bars" aria-hidden="true"><i /><i /><i /></span>

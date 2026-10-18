@@ -13,9 +13,9 @@ test.describe("Sietch — tests de base", () => {
   test("le son est désactivé par défaut", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Entrer en silence" }).click();
-    const btn = page.getByRole("button", { name: /Activer le son|Couper le son/ });
+    const btn = page.getByRole("button", { name: /Son coupé : activer|Son : couper/ });
     await expect(btn).toHaveAttribute("aria-pressed", "false");
-    await expect(btn).toHaveAccessibleName("Activer le son");
+    await expect(btn).toHaveAccessibleName("Son coupé : activer");
     const stored = await page.evaluate(() => localStorage.getItem("sietch-son"));
     expect(stored).toBeNull();
   });

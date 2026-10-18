@@ -18,6 +18,7 @@ const SAND_SCENES: SceneId[] = ["desert", "epice"];
  */
 export function ScrollRig() {
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("rail") === "0") return; // diagnostic : page sans rail
     const reduce = prefersReducedMotion();
     const html = document.documentElement;
     html.dataset.motion = reduce ? "reduce" : "full";

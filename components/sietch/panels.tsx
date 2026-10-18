@@ -36,18 +36,18 @@ export function BooksPanel() {
   return (
     <>
       <p className="console__intro">Six romans de Frank Herbert, un univers étendu de Brian Herbert et Kevin J. Anderson, et un conseil simple : commencer par le début.</p>
-      <h3 className="card__k" style={{ marginBottom: 10 }}>Par où commencer</h3>
+      <p className="card__k" style={{ marginBottom: 10 }}>Par où commencer</p>
       <ol className="steps">
         {READING_GUIDE.map((s) => (
           <li key={s.title}><div><b>{s.title}</b><span>{s.text}</span></div></li>
         ))}
       </ol>
-      <h3 className="card__k" style={{ margin: "26px 0 10px" }}>Les six romans de Frank Herbert</h3>
+      <p className="card__k" style={{ margin: "26px 0 10px" }}>Les six romans de Frank Herbert</p>
       <div className="console__grid console__grid--3">
         {NOVELS.map((n) => (
           <article key={n.n} className="card">
             <span className="card__k">{String(n.n).padStart(2, "0")} · {n.year}</span>
-            <h4 className="card__t">{n.fr}</h4>
+            <h3 className="card__t">{n.fr}</h3>
             <p className="card__m">{n.en}</p>
             <p className="card__p">{n.text}</p>
           </article>
@@ -58,7 +58,7 @@ export function BooksPanel() {
         {EXPANDED.map((c) => (
           <article key={c.name} className="card">
             <span className="card__k">{c.years}</span>
-            <h4 className="card__t">{c.name}</h4>
+            <h3 className="card__t">{c.name}</h3>
             <p className="card__m">{c.books.join(" · ")}</p>
             <p className="card__p">{c.text}</p>
           </article>
@@ -109,7 +109,7 @@ export function GamePanel() {
           </ul>
         </article>
       </div>
-      <h3 className="card__k" style={{ margin: "26px 0 10px" }}>Actualités récentes</h3>
+      <p className="card__k" style={{ margin: "26px 0 10px" }}>Actualités récentes</p>
       <ol className="news">
         {GAME.news.map((n) => (
           <li key={n.date}><time dateTime={n.date}>{n.label}</time><p>{n.text}</p></li>
