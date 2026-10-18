@@ -275,7 +275,7 @@ export const HULL_FRAG = /* glsl */ `
     vec3 base = vec3(0.36, 0.30, 0.25) * (0.84 + 0.32 * idMid);
     base = mix(base, base * 0.5, dark);
     base *= (0.3 + 0.7 * grooveBig) * (0.62 + 0.38 * grooveMid) * (0.92 + 0.08 * fine);
-    base += (fbm2(vL.xy * 0.35) - 0.5) * 0.05;
+    base += (noise2(vL.xy * 0.35) - 0.5) * 0.06; /* usure : une octave suffit (quatre coûtaient cher en rendu logiciel) */
     /* deux longerons peints sombres, de la proue à la poupe */
     float spar = smoothstep(0.03, 0.06, abs(fract(ang / 3.14159 + 0.37) - 0.5));
     base *= 0.72 + 0.28 * spar;
@@ -302,7 +302,7 @@ export const HULL_FRAG = /* glsl */ `
  *  feu — un quart d'entre eux sont des éclats brefs, les autres un battement lent. Couleurs par sommet (aColor). */
 export const LIGHT_VERT = /* glsl */ `
   attribute float aSeed; attribute float aSize; attribute vec3 aColor;
-  uniform float uTime; uniform float uPixelRatio; uniform float uFade;
+  uniform float uTime; uniform float uPixelRatio; uniform float uFade; uniform float uMax;
   varying vec3 vC; varying float vA;
   void main() {
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
@@ -314,7 +314,7 @@ export const LIGHT_VERT = /* glsl */ `
     float k = mix(steady, 0.06 + flash, strobe);
     vA = k * uFade;
     vC = aColor;
-    gl_PointSize = aSize * uPixelRatio * clamp(220.0 / depth, 1.6, 12.0) * (0.75 + 0.25 * k);
+    gl_PointSize = aSize * uPixelRatio * clamp(220.0 / depth, 1.6, uMax) * (0.75 + 0.25 * k);
     gl_Position = projectionMatrix * mv;
   }
 `;

@@ -197,27 +197,32 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   collar.position.x = (T_BAY - 0.5) * SHIP_L;
   collar.rotation.y = Math.PI / 2;
   ship.add(collar);
-  const plotGeo = keep(new THREE.BoxGeometry(2.4, 1.4, 2.2));
+  const plots = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(2.4, 1.4, 2.2)), collarMat, 12);
   for (let k = 0; k < 12; k++) {
     const a = (k / 12) * Math.PI * 2 + 0.26;
-    const plot = new THREE.Mesh(plotGeo, collarMat);
-    plot.position.set(collar.position.x, Math.cos(a) * (collarR + 1.6), Math.sin(a) * (collarR + 1.6));
-    plot.rotation.x = -a;
-    ship.add(plot);
+    dummy.position.set(collar.position.x, Math.cos(a) * (collarR + 1.6), Math.sin(a) * (collarR + 1.6));
+    dummy.rotation.set(-a, 0, 0, "XYZ");
+    dummy.scale.setScalar(1);
+    dummy.updateMatrix();
+    plots.setMatrixAt(k, dummy.matrix);
   }
-  // Mâts et antennes : fines tiges radiales, un feu blanc à éclats à leur sommet (ajouté aux feux plus bas).
+  plots.instanceMatrix.needsUpdate = true;
+  ship.add(plots);
+  // Mâts et antennes : fines tiges radiales (un seul appel de dessin), un feu blanc à éclats à leur sommet.
   const masts: [number, number, number][] = [[0.17, 0.9, 9], [0.26, 3.6, 12], [0.4, 5.2, 7], [0.52, 1.9, 14], [0.63, 0.3, 8], [0.74, 4.2, 11], [0.86, 2.6, 6], [0.46, 3.0, 5]];
-  const mastGeo = keep(new THREE.BoxGeometry(0.3, 1, 0.3));
+  const mastMesh = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(0.3, 1, 0.3)), railMat, masts.length);
   const mastTips: number[] = [];
-  for (const [t, a, h] of masts) {
+  masts.forEach(([t, a, h], k) => {
     const base = hullR(t) + 1.5 * Math.sin(40 * t) * Math.sin(Math.PI * t);
-    const mast = new THREE.Mesh(mastGeo, railMat);
-    mast.position.set((t - 0.5) * SHIP_L, Math.cos(a) * (base + h / 2), Math.sin(a) * (base + h / 2));
-    mast.rotation.set(a, 0, 0, "XZY");
-    mast.scale.y = h;
-    ship.add(mast);
+    dummy.position.set((t - 0.5) * SHIP_L, Math.cos(a) * (base + h / 2), Math.sin(a) * (base + h / 2));
+    dummy.rotation.set(a, 0, 0, "XZY");
+    dummy.scale.set(1, h, 1);
+    dummy.updateMatrix();
+    mastMesh.setMatrixAt(k, dummy.matrix);
     mastTips.push((t - 0.5) * SHIP_L, Math.cos(a) * (base + h + 0.3), Math.sin(a) * (base + h + 0.3));
-  }
+  });
+  mastMesh.instanceMatrix.needsUpdate = true;
+  ship.add(mastMesh);
   // Bandes de hublots : fines lignes émissives le long de la coque (échelle et habitation), alignées sur les quartiers.
   const stripMat = keep(new THREE.MeshBasicMaterial({ color: 0xf2b544, transparent: true, opacity: 0.8 }));
   const stripGeo = keep(new THREE.BoxGeometry(1, 0.16, 0.16));
@@ -237,7 +242,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
      travail près de la soute et des quartiers. Jamais une référence à un design existant. */
   const lightMat = keep(new THREE.ShaderMaterial({
     vertexShader: LIGHT_VERT, fragmentShader: LIGHT_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uPixelRatio: { value: pixelRatio }, uFade: { value: 1 } },
+    uniforms: { uTime: { value: 0 }, uPixelRatio: { value: pixelRatio }, uFade: { value: 1 }, uMax: { value: pick(12, 9, 6) } }, // taille maximale d'un feu proche (pixels avant densité) : le halo coûte en remplissage
   }));
   type LightSpec = { x: number; y: number; z: number; r: number; g: number; b: number; size: number; seed: number };
   const lightList: LightSpec[] = [];
@@ -336,6 +341,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   const mouthGlow = new THREE.Mesh(keep(new THREE.CircleGeometry(MOUTH_R + 2, 48)), glowMat);
   mouthGlow.rotation.x = Math.PI / 2;
   mouthGlow.position.y = MOUTH_Y - 1.2;
+  mouthGlow.visible = tier !== "low"; // grand disque additif proche de la caméra : remplissage coûteux sur appareil faible
   bay.add(mouthGlow);
   bay.position.set(-20, 0, 22);
   space.add(bay);
@@ -556,21 +562,24 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       // En portrait, caméra plus à gauche et regard plus bas : le vaisseau tient dans le coin supérieur droit, au-dessus
       // du titre, loin de l'épigraphe et du paragraphe.
       const portrait = camera.aspect < 0.8;
-      const x0 = portrait ? -38 : -30;
+      // Départ : presque au centre de la soute, 32 unités sous l'axe du fuseau (la coque, ses panneaux et ses feux
+      // remplissent un quart de l'écran). Bureau : regard 20° à gauche et 6° vers le bas → le fuseau file en diagonale
+      // dans le quart supérieur droit, la colonne de texte reste libre. Portrait : regard 3° à droite et 8° vers le bas →
+      // le fuseau occupe la bande au-dessus du titre (0–22 % de la hauteur), la planète n'est qu'un limbe en bas.
+      const x0 = -18, yStart = -10;
       if (shuttleX0 !== x0) buildShuttles(x0);
-      const yStart = -22, yExit = -96, yOrbit = -420;
+      const yExit = -96, yOrbit = -420;
       const y = lerp(lerp(yStart, yExit, smoothstep(0, 1, exitT)), yOrbit, smoothstep(0, 1, orbitT) * entryT * 0 + smoothstep(0, 1, orbitT));
       wantPos.set(x0 + Math.sin(exitT * 1.3) * 5 + orbitT * 20, y, 24 + exitT * 18 + orbitT * 30);
-      // Regard : d'abord un point fixe devant, au niveau de la bouche (en descendant, le regard remonte vers elle),
-      // puis la planète en dessous.
       const look = smoothstep(0.15, 0.9, orbitT);
-      if (portrait) tmp.set(x0 + 17, -59, -136); else tmp.set(x0 - 36, -36, -140);
-      // En sortant, le regard remonte vers la bouche éclairée et le fuseau qu'on quitte.
-      tmp.lerp(wantTarget.set(x0 + (portrait ? 10 : 24), 30, -100), smoothstep(0.2, 1, exitT) * 0.85);
+      if (portrait) tmp.set(x0 + 9, yStart - 29, 24 - 165); else tmp.set(x0 - 69, yStart - 8, 24 - 156);
+      // En sortant, le regard remonte vers la bouche éclairée et le fuseau qu'on quitte (dès le début de la sortie,
+      // pour ne jamais le perdre de vue), puis bascule vers la planète.
+      tmp.lerp(wantTarget.set(x0 + (portrait ? 8 : 24), 30, -100), smoothstep(0, 0.9, exitT) * 0.9);
       tmp.lerp(wantTarget.set(0, -600, -200), look);
       wantTarget.copy(tmp);
-      // Planète : loin et basse au début (plus basse encore en portrait : sous le paragraphe), elle monte pendant l'entrée.
-      const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60 - (portrait ? 150 * (1 - orbitT) : 0);
+      // Planète : loin et basse au début (plus basse en portrait : sous le paragraphe), elle monte pendant l'entrée.
+      const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60 - (portrait ? 150 : 60) * (1 - orbitT);
       const planetZ = lerp(-440, -420, orbitT) + entryT * 150;
       planet.position.set(10, planetY, planetZ);
       halo.position.copy(planet.position);
@@ -626,7 +635,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       if (dust.visible) {
         dustMat.uniforms.uTime.value = time;
         dustMat.uniforms.uAlpha.value = 0.55 * (1 - smoothstep(0.45, 0.9, exitT));
-        dust.position.set(x0, -22, 24);
+        dust.position.set(x0, yStart, 24);
       }
       // Brouillard : l'espace est net ; la tempête l'épaissit, ocre.
       fogColor.copy(spaceFog).lerp(stormFog, stormT);
