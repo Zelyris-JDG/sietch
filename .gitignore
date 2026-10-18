@@ -1,0 +1,14 @@
+/node_modules
+/.next/
+/out/
+*.tsbuildinfo
+.DS_Store
+npm-debug.log*
+.pnpm-debug.log*
+/.pnpm-store/
+.env*
+!.env.example
+.vercel
+/playwright-report/
+/test-results/
+/.captures-tmp/
