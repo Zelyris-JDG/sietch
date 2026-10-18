@@ -45,6 +45,7 @@ export const FILMS: Film[] = [
     dates: [
       { label: "France", value: "15 septembre 2021" },
       { label: "États-Unis", value: "22 octobre 2021" },
+      { label: "Ressortie France", value: "11 novembre 2026" },
     ],
     text: "La première moitié du roman : l'arrivée des Atréides sur Arrakis, la trahison, la fuite dans le désert. La France l'a découvert plus d'un mois avant les États-Unis.",
     links: [
@@ -62,6 +63,7 @@ export const FILMS: Film[] = [
     dates: [
       { label: "France", value: "28 février 2024" },
       { label: "États-Unis", value: "1er mars 2024" },
+      { label: "Ressortie France", value: "11 novembre 2026" },
     ],
     text: "La seconde moitié du roman : la vie chez les Fremen, la guerre de l'épice et le prix d'une prophétie. Repoussé par la grève des acteurs de l'été 2023, puis avancé de deux semaines au 1er mars aux États-Unis.",
     links: [
@@ -80,7 +82,7 @@ export const FILMS: Film[] = [
       { label: "France", value: "16 décembre 2026" },
       { label: "États-Unis", value: "18 décembre 2026" },
     ],
-    text: "Le troisième volet, annoncé pour décembre 2026. Il s'attaque à la suite du premier roman : ce qui arrive à un empereur qui a vu l'avenir.",
+    text: "Le troisième volet, annoncé pour décembre 2026, adapte Le Messie de Dune, la suite du premier roman : ce qui arrive à un empereur qui a vu l'avenir.",
     links: [{ label: "X · @dunemovie", href: "https://x.com/dunemovie" }],
   },
   {
