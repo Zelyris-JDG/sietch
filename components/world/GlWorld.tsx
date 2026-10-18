@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { StillWorld } from "./StillWorld";
 import type { DeviceTier } from "../../src/lib/prefs";
+import type { MediaPaths } from "../../src/config/media";
 
 /** Monde WebGL : le module three.js n'est chargé qu'ici. En attendant (ou en cas d'échec), la version calme reste visible. */
-export function GlWorld({ tier }: { tier: DeviceTier }) {
+export function GlWorld({ tier, images }: { tier: DeviceTier; images?: MediaPaths }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -36,7 +37,7 @@ export function GlWorld({ tier }: { tier: DeviceTier }) {
 
   return (
     <>
-      {(!ready || failed) && <StillWorld />}
+      {(!ready || failed) && <StillWorld images={images} />}
       {!failed && <div id="world" aria-hidden="true" style={{ opacity: ready ? 1 : 0, transition: "opacity 1200ms ease" }}><canvas ref={ref} /></div>}
     </>
   );

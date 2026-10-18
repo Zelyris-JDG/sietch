@@ -8,6 +8,7 @@ Chaque fait publié sur le site est vérifié sur le web le jour indiqué, par l
 - Lenis : licence MIT © darkroom.engineering — https://github.com/darkroomengineering/lenis (fiche npm et Best of JS) — vérifié le 18/10/2026.
 - three.js : licence MIT — https://github.com/mrdoob/three.js — vérifié dans `node_modules/three/LICENSE` le 18/10/2026.
 - Polices : Cormorant Garamond (Catharsis Fonts), Archivo (Omnibus-Type), IBM Plex Mono (IBM) — SIL Open Font License 1.1, fichiers OFL.txt récupérés depuis github.com/google/fonts le 18/10/2026 (`src/fonts/`).
+- Polices servies depuis C2 (18/10/2026) : versions modifiées au sens de l'OFL — sous-ensemble latin (caractères réellement utilisés par le site : latin de base, latin-1, latin étendu A, ponctuation, flèches, « ≈ », « − », « € »), sans hinting, et instances partielles des polices variables (Archivo : graisses 300–500 et largeurs 100–125 % ; Cormorant Garamond : graisses 300–500), produites avec fontTools 4.67 (`pyftsubset`, `varLib.instancer`). Conformément à l'OFL (noms réservés), leurs noms internes sont « Archivo Sietch », « Cormorant Garamond Sietch » et « Sietch Mono » (« Plex » est un nom réservé d'IBM) ; elles restent sous OFL avec leurs fichiers de licence. Originaux : github.com/google/fonts. Poids : Archivo 90 → 38 ko, Cormorant italique 39 → 32 ko, Plex Mono 15 → 8,5 ko par graisse.
 
 ## Films
 

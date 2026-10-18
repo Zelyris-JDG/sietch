@@ -454,3 +454,6 @@ html[data-sky="dusk"] .sw--dunes { filter: hue-rotate(-8deg) brightness(.95); }
 html[data-section="entree"] .grain { opacity: 0.55; }
 html[data-section="desert"] .grain { opacity: 0.18; }
 @media (prefers-reduced-motion: reduce) { .grain { display: none; } }
+
+/* Polices sous-ensemblées (C2) : Archivo n'est servi qu'en graisses 300–500 ; le gras sémantique reste 500, jamais un gras synthétique. */
+b, strong { font-weight: 500; }

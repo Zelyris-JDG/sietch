@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrakisMap } from "./ArrakisMap";
+import type { MediaPaths } from "../../src/config/media";
 import { BooksPanel, FilmsPanel, GamePanel, NetworksPanel, TimelinePanel } from "./panels";
 import { PartThreeTicker } from "./PartThreeCountdown";
 import { DATA_VERIFIED_LABEL } from "../../src/content/sietch";
@@ -18,7 +19,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 /** Console Mentat : onglets accessibles (flèches, Début, Fin), un panneau à la fois, le jeu mis en avant. */
-export function Console() {
+export function Console({ images }: { images?: MediaPaths }) {
   const [tab, setTab] = useState<TabId>("jeu");
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -72,7 +73,7 @@ export function Console() {
           {t.id === "films" && <FilmsPanel />}
           {t.id === "livres" && <BooksPanel />}
           {t.id === "reseaux" && <NetworksPanel />}
-          {t.id === "carte" && <ArrakisMap />}
+          {t.id === "carte" && <ArrakisMap images={images} />}
           {t.id === "chronologie" && <TimelinePanel />}
         </div>
       ))}

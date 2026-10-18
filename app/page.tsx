@@ -13,15 +13,19 @@ import { PrescienceToggle, Releases } from "../components/experience/Prescience"
 import { Footer } from "../components/experience/Footer";
 import { World } from "../components/world/World";
 import { Console } from "../components/sietch/Console";
+import { MediaBackdrop } from "../components/ui/MediaBackdrop";
+import { presentMedia } from "../src/lib/media.server";
 
 const byId = Object.fromEntries(SCENES_CONTENT.map((s) => [s.id, s]));
 
 export default function Home() {
   const hero = byId.orbite;
+  // Images déposées par Johan dans public/images/ (docs/medias.md) : détectées au build, absentes = rendu procédural.
+  const images = presentMedia();
   return (
     <>
       <Intro />
-      <World />
+      <World images={images} />
       <ScrollRigLoader />
       <Hud />
       <main id="main" tabIndex={-1}>
@@ -46,7 +50,7 @@ export default function Home() {
 
         <SceneBlock scene={byId.entree} />
         <SceneBlock scene={byId.desert} />
-        <SceneBlock scene={byId.epice} tall="mid" />
+        <SceneBlock scene={byId.epice} tall="mid" backdrop={<MediaBackdrop src={images["spice-sand"]} opacity={0.35} />} />
 
         <SceneBlock scene={byId.maisons} tall="flat">
           <ul className="houses" data-reveal>
@@ -62,9 +66,9 @@ export default function Home() {
           </ul>
         </SceneBlock>
 
-        <SceneBlock scene={byId.sietch} tall="flat">
+        <SceneBlock scene={byId.sietch} tall="flat" backdrop={<MediaBackdrop src={images["cavern-light"]} variant="top" />}>
           <div style={{ marginTop: "clamp(2rem, 5vh, 4rem)" }} data-reveal>
-            <Console />
+            <Console images={images} />
           </div>
         </SceneBlock>
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { StillWorld } from "./StillWorld";
 import { deviceTier, prefersReducedMotion, webglAvailable, type DeviceTier } from "../../src/lib/prefs";
 import { storageKeys } from "../../src/config/site";
+import type { MediaPaths } from "../../src/config/media";
 
 const GlWorld = dynamic(() => import("./GlWorld").then((m) => m.GlWorld), { ssr: false });
 
@@ -12,7 +13,7 @@ const GlWorld = dynamic(() => import("./GlWorld").then((m) => m.GlWorld), { ssr:
  * Choisit le monde : WebGL (three.js chargé à la demande) quand l'appareil le permet, sinon la version calme.
  * Le choix se fait après le premier rendu : le serveur envoie toujours la version calme, visible tout de suite.
  */
-export function World() {
+export function World({ images }: { images?: MediaPaths }) {
   const [mode, setMode] = useState<"still" | "gl">("still");
   const [tier, setTier] = useState<DeviceTier>("high");
   useEffect(() => {
@@ -53,6 +54,6 @@ export function World() {
       window.removeEventListener("load", idle);
     };
   }, []);
-  if (mode === "gl") return <GlWorld tier={tier} />;
-  return <StillWorld />;
+  if (mode === "gl") return <GlWorld tier={tier} images={images} />;
+  return <StillWorld images={images} />;
 }

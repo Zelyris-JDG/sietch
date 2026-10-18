@@ -3,10 +3,11 @@ import { Epigraph } from "../ui/Epigraph";
 import { RichText } from "../ui/RichText";
 
 /** Une scène de la descente : index, sur-titre, épigraphe, titre, texte. Le héro est rendu à part (page.tsx). */
-export function SceneBlock({ scene, tall = "tall", children }: { scene: Scene; tall?: "tall" | "mid" | "flat"; children?: React.ReactNode }) {
+export function SceneBlock({ scene, tall = "tall", backdrop, children }: { scene: Scene; tall?: "tall" | "mid" | "flat"; backdrop?: React.ReactNode; children?: React.ReactNode }) {
   const cls = tall === "flat" ? "scene scene--flat" : tall === "mid" ? "scene scene--mid" : "scene scene--tall";
   return (
     <section id={scene.id} className={cls} data-scene aria-labelledby={`${scene.id}-title`}>
+      {backdrop}
       <div className="scene__veil" aria-hidden="true" />
       <div className={tall === "flat" ? "" : "scene__sticky"}>
         <header className="scene__head" data-reveal>
