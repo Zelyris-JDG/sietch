@@ -213,6 +213,7 @@ html[data-descent="on"] .hud--alt { opacity: 1; transform: none; }
 /* ---- Intro ---------------------------------------------------------------------- */
 .intro { position: fixed; inset: 0; z-index: 50; background: var(--basalt); display: grid; place-items: center; text-align: center; padding: var(--gutter); transition: opacity 900ms var(--ease-out), visibility 0s linear 900ms; }
 .intro[data-state="gone"] { opacity: 0; visibility: hidden; pointer-events: none; }
+html[data-intro="seen"] .intro { display: none; } /* intro déjà vue dans la session (posé avant le premier rendu par le script d'amorçage) : aucun éclair au retour d'une page */
 .intro__inner { display: grid; gap: 2rem; justify-items: center; max-width: 34rem; }
 .intro__breath { width: 1px; height: 64px; background: linear-gradient(to bottom, transparent, var(--sand), transparent); animation: breath 4.5s ease-in-out infinite; }
 @keyframes breath { 0%, 100% { opacity: 0.25; transform: scaleY(0.6); } 50% { opacity: 1; transform: scaleY(1); } }
