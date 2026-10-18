@@ -1,0 +1,18 @@
+import { chromium } from "@playwright/test";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+page.on("console", (m) => { if (["error", "warning"].includes(m.type())) console.log("CONSOLE", m.type(), m.text().slice(0, 300)); });
+page.on("pageerror", (e) => console.log("PAGEERROR", e.message.slice(0, 500)));
+await page.goto("http://127.0.0.1:3100/", { waitUntil: "networkidle" });
+await page.waitForTimeout(1500);
+console.log("html class:", await page.evaluate(() => document.documentElement.className));
+console.log("intro state before:", await page.evaluate(() => document.querySelector(".intro")?.getAttribute("data-state")));
+await page.getByRole("button", { name: "Entrer en silence" }).click();
+await page.waitForTimeout(1500);
+console.log("intro state after:", await page.evaluate(() => document.querySelector(".intro")?.getAttribute("data-state")));
+console.log("data attrs:", await page.evaluate(() => JSON.stringify({ ...document.documentElement.dataset })));
+await page.evaluate(() => window.scrollTo(0, 3000));
+await page.waitForTimeout(1500);
+console.log("scrollY:", await page.evaluate(() => window.scrollY), "data attrs:", await page.evaluate(() => JSON.stringify({ ...document.documentElement.dataset })));
+console.log("prescience btn count:", await page.getByRole("button", { name: "Prendre l’épice" }).count());
+await browser.close();

@@ -1,0 +1,661 @@
+/* Sietch — styles globaux. Jetons de la direction artistique (docs/BIBLE.md). */
+:root {
+  --basalt: #0b0908;
+  --basalt-2: #130f0d;
+  --basalt-3: #1c1613;
+  --sand: #d9b98a;
+  --sand-light: #ead8b6;
+  --sand-dim: #b79a73;
+  --ocre: #b8742a;
+  --spice: #e8651a;
+  --spice-soft: #f08a4b;
+  --blue: #1e3a8a;
+  --blue-light: #8fa8ff;
+  --amber: #f2b544;
+  --amber-dim: #b9842e;
+  --line: rgba(234, 216, 182, 0.14);
+  --line-strong: rgba(234, 216, 182, 0.3);
+  --text: var(--sand-light);
+  --muted: var(--sand-dim);
+  --accent: var(--spice);
+  --font-caps: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-plex), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --gutter: clamp(20px, 5vw, 72px);
+  --measure: 36rem;
+  color-scheme: dark;
+}
+
+html[data-prescience="on"] {
+  --accent: var(--blue-light);
+  --text: #dde4ff;
+  --muted: #9aa6d6;
+  --line: rgba(221, 228, 255, 0.16);
+  --line-strong: rgba(221, 228, 255, 0.34);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: auto; }
+html, body { margin: 0; padding: 0; background: var(--basalt); color: var(--text); overflow-x: clip; }
+body {
+  font-family: var(--font-caps);
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  min-height: 100vh; min-height: 100svh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: rgba(232, 101, 26, 0.45); color: #fff; }
+a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 0.18em; }
+a:hover { text-decoration-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+button, [role="button"] { -webkit-user-select: none; user-select: none; } /* Safari ne lit que la forme préfixée */
+img, svg, canvas { display: block; max-width: 100%; }
+p { margin: 0 0 1em; max-width: var(--measure); }
+h1, h2, h3, h4 { margin: 0; font-weight: 500; line-height: 1.1; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.skip-link { position: fixed; top: -100px; left: 16px; z-index: 100; padding: 10px 14px; background: var(--basalt); border: 1px solid var(--line-strong); font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.skip-link:focus { top: 16px; }
+
+/* ---- Typographie de la DA ---------------------------------------------------- */
+.caps {
+  font-family: var(--font-caps);
+  font-stretch: 112%;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.caps--light { color: var(--text); }
+.monument {
+  font-family: var(--font-caps);
+  font-stretch: 118%;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  line-height: 1.05;
+  font-size: clamp(1.6rem, 6.2vw, 5.6rem);
+  margin-left: 0.16em; /* compense l'espacement de la dernière lettre */
+}
+.monument--small { font-size: clamp(1.2rem, 3.4vw, 2.6rem); letter-spacing: 0.36em; }
+.epigraph {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.55rem, 3.6vw, 3.2rem);
+  line-height: 1.25;
+  max-width: 24ch;
+  color: var(--text);
+  margin: 0;
+  text-wrap: balance;
+}
+.epigraph cite { display: block; font-style: normal; font-family: var(--font-caps); font-stretch: 112%; font-size: 0.68rem; letter-spacing: 0.42em; text-transform: uppercase; color: var(--muted); margin-top: 1.1em; }
+.prose { max-width: var(--measure); font-size: clamp(1rem, 1.05vw + 0.6rem, 1.2rem); line-height: 1.65; font-weight: 400; }
+.prose p + p { margin-top: 0.4em; }
+.mono { font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.06em; }
+
+/* ---- Lexique vivant ---------------------------------------------------------- */
+.term {
+  position: relative;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline dotted var(--line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: help;
+  -webkit-user-select: text;
+  user-select: text;
+  border-radius: 2px;
+}
+.term:hover, .term:focus-visible, .term[aria-expanded="true"] { text-decoration-color: var(--accent); color: var(--text); }
+.term__tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(calc(-50% + var(--tip-shift, 0px)));
+  width: min(22rem, 86vw);
+  padding: 12px 14px;
+  background: var(--basalt-2);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  font-family: var(--font-caps);
+  font-stretch: 100%;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  text-align: left;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 180ms var(--ease-out), visibility 0s linear 180ms;
+}
+.term__tip::before { content: ""; position: absolute; top: 100%; left: calc(50% - var(--tip-shift, 0px)); width: 10px; height: 10px; margin-left: -5px; margin-top: -5px; background: var(--basalt-2); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); transform: rotate(45deg); }
+.term__tip b { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
+.scene__sticky .term__tip, .hero .term__tip { text-shadow: none; } /* l'infobulle a son propre fond : pas de halo hérité */
+.term:hover > .term__tip, .term:focus-visible > .term__tip, .term[aria-expanded="true"] > .term__tip { opacity: 1; visibility: visible; transition-delay: 0s; }
+.term--below > .term__tip { bottom: auto; top: calc(100% + 10px); }
+.term--below > .term__tip::before { top: auto; bottom: 100%; margin-top: 0; margin-bottom: -5px; transform: rotate(225deg); }
+
+/* ---- Mise en page des scènes -------------------------------------------------- */
+#world { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+#world canvas { width: 100%; height: 100%; }
+.still-world { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+main { position: relative; z-index: 1; }
+.scene { position: relative; min-height: 100vh; min-height: 100svh; padding: 0 var(--gutter); }
+.scene--tall { min-height: 220vh; min-height: 220svh; }
+.scene--mid { min-height: 170vh; min-height: 170svh; }
+.scene__sticky { position: sticky; top: 0; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: clamp(56px, 10vh, 120px); padding-top: 18vh; }
+.scene__sticky--center { justify-content: center; padding-bottom: 0; }
+.scene__head { display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: clamp(1.5rem, 4vh, 3rem); }
+.scene__body { display: grid; gap: clamp(1.2rem, 3vw, 3rem); align-items: end; }
+@media (min-width: 900px) { .scene__body { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.scene__index { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--muted); }
+.scene--flat { padding-top: clamp(80px, 14vh, 160px); padding-bottom: clamp(80px, 14vh, 160px); }
+.scene--flat .scene__head { max-width: 60rem; }
+
+/* Héro */
+.hero { min-height: 100vh; min-height: 100svh; display: grid; align-content: end; padding-bottom: clamp(64px, 12vh, 140px); }
+.hero__mark { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.22em; color: var(--amber); margin-bottom: 2rem; }
+.hero__title { display: grid; gap: 0.6em; }
+.hero__sub { margin-top: 2rem; max-width: 34rem; }
+.hero__hint { margin-top: 3rem; display: inline-flex; align-items: center; gap: 14px; color: var(--muted); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; }
+.hero__hint i { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--accent), transparent); animation: hint-drop 2.2s var(--ease-out) infinite; }
+@keyframes hint-drop { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+/* Voiles de lisibilité (jamais de flou) */
+.scene__veil { display: none; }
+.descent-veil { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to right, rgba(11, 9, 8, 0.36) 0%, rgba(11, 9, 8, 0.24) 40%, rgba(11, 9, 8, 0) 68%), linear-gradient(to top, rgba(11, 9, 8, 0.66) 0%, rgba(11, 9, 8, 0.32) 38%, rgba(11, 9, 8, 0.08) 64%, rgba(11, 9, 8, 0.18) 100%); } /* C2 : colonne gauche un peu plus voilée (indice et signature du désert en plein jour mesurés à 3,3 et 4,3 sans le halo) */
+/* Ombre portée douce derrière chaque bloc de texte des scènes sur monde rendu (entrée, désert, épice) : le fond
+   mesuré sous le texte baisse d'un tiers même sur une crête de dune en plein jour, sans couture ni boîte (bords fondus). */
+.scene__sticky .scene__head, .scene__sticky .scene__body { position: relative; }
+.scene__sticky .scene__head::before, .scene__sticky .scene__body::before { content: ""; position: absolute; inset: -30% -10%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, rgba(11, 9, 8, 0.6) 0%, rgba(11, 9, 8, 0.44) 40%, rgba(11, 9, 8, 0.16) 68%, rgba(11, 9, 8, 0) 84%); }
+/* Halo serré + halo large : le texte clair reste lisible sur le sable du plein jour (mesure : scripts/diag-contraste.mjs). */
+.scene__sticky, .hero { text-shadow: 0 0 2px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.75), 0 0 24px rgba(0, 0, 0, 0.62); } /* C2 : halo un peu plus dense (crêtes de dunes en plein jour sous les textes du désert) */
+.scene__sticky .scene__index, .hero .scene__index, .scene__sticky .epigraph cite, .hero .epigraph cite { color: var(--text); }
+.scene--flat { text-shadow: none; }
+.scene--flat .scene__veil { display: block; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: rgba(11, 9, 8, 0.80); }
+.scene { z-index: 1; }
+
+/* ---- Console (HUD) ------------------------------------------------------------ */
+.hud { position: fixed; z-index: 20; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; color: var(--amber); pointer-events: none; }
+.hud a, .hud button { pointer-events: auto; }
+.hud--alt { left: calc(var(--gutter) - 12px); top: max(10px, env(safe-area-inset-top)); display: grid; gap: 4px; padding: 10px 12px; background: rgba(11, 9, 8, 0.86); border: 1px solid rgba(242, 181, 68, 0.12); opacity: 0; transform: translateY(-6px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+html[data-descent="on"] .hud--alt { opacity: 1; transform: none; }
+.hud__label { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.22em; }
+.hud__value { font-size: clamp(1rem, 1.6vw, 1.35rem); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }
+.hud__phase { font-size: 0.62rem; letter-spacing: 0.22em; color: var(--sand-dim); }
+.hud--tools { right: var(--gutter); top: max(14px, env(safe-area-inset-top)); display: flex; gap: 6px; align-items: center; }
+.hud-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); background: rgba(11, 9, 8, 0.82); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; transition: border-color 200ms, background 200ms; }
+.hud-btn:hover { border-color: var(--accent); }
+.hud-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.hud-btn__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.hud-btn[aria-pressed="true"] .hud-btn__dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.hud-btn__bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 12px; }
+.hud-btn__bars i { width: 2px; height: 4px; background: currentColor; }
+.hud-btn[aria-pressed="true"] .hud-btn__bars i { animation: eq 900ms ease-in-out infinite alternate; }
+.hud-btn[aria-pressed="true"] .hud-btn__bars i:nth-child(2) { animation-delay: 150ms; }
+.hud-btn[aria-pressed="true"] .hud-btn__bars i:nth-child(3) { animation-delay: 300ms; }
+@keyframes eq { from { height: 3px; } to { height: 12px; } }
+.hud-nav { position: fixed; right: var(--gutter); top: 50%; transform: translateY(-50%); z-index: 20; display: none; flex-direction: column; gap: 14px; }
+@media (min-width: 1024px) and (min-height: 600px) { .hud-nav { display: flex; } }
+.hud-nav a { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-height: 24px; text-decoration: none; color: var(--muted); font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; }
+.hud-nav a span { opacity: 0; transform: translateX(6px); transition: opacity 200ms, transform 200ms var(--ease-out); }
+.hud-nav a:hover span, .hud-nav a:focus-visible span, .hud-nav a[aria-current="true"] span { opacity: 1; transform: none; }
+.hud-nav a i { width: 14px; height: 1px; background: currentColor; transition: width 200ms var(--ease-out), background 200ms; }
+.hud-nav a[aria-current="true"] { color: var(--accent); }
+.hud-nav a[aria-current="true"] i { width: 28px; }
+
+/* ---- Intro ---------------------------------------------------------------------- */
+/* L'intro tient dans n'importe quel écran : grille + marges automatiques (centrée quand il y a de la place, alignée en
+   haut et défilable sinon — téléphone à l'horizontale, petite fenêtre), jamais de bouton hors écran. */
+.intro { position: fixed; inset: 0; z-index: 50; background: var(--basalt); display: grid; overflow-y: auto; overscroll-behavior: contain; text-align: center; padding: var(--gutter); transition: opacity 900ms var(--ease-out), visibility 0s linear 900ms; } /* overscroll-behavior : sur iOS, `overflow: hidden` sur html ne bloque pas le défilement au doigt ; l'intro ne transmet pas son dépassement à la page derrière elle */
+.intro__inner { margin: auto; }
+@media (max-height: 600px) { .intro__inner { gap: 1rem; } .intro__breath { height: 28px; } }
+/* Écran bas (téléphone à l'horizontale, petite fenêtre) : la plaque d'altitude passe en bas à gauche, compacte,
+   comme sur téléphone, pour ne pas couvrir le texte qui commence près du haut. */
+@media (max-height: 520px) {
+  .hud--alt { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); left: var(--gutter); padding: 6px 10px; gap: 0; }
+  .hud__label, .hud__phase { display: none; }
+  .hud__value { font-size: 0.88rem; }
+  .toast { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 52px); }
+}
+.intro[data-state="gone"] { opacity: 0; visibility: hidden; pointer-events: none; }
+html[data-intro="seen"] .intro { display: none; } /* intro déjà vue dans la session (posé avant le premier rendu par le script d'amorçage) : aucun éclair au retour d'une page */
+.intro__inner { display: grid; gap: 2rem; justify-items: center; max-width: 34rem; }
+.intro__breath { width: 1px; height: 64px; background: linear-gradient(to bottom, transparent, var(--sand), transparent); animation: breath 4.5s ease-in-out infinite; }
+@keyframes breath { 0%, 100% { opacity: 0.25; transform: scaleY(0.6); } 50% { opacity: 1; transform: scaleY(1); } }
+.intro__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; padding: 0 22px; border: 1px solid var(--line-strong); font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text); text-decoration: none; transition: border-color 200ms, background 200ms, color 200ms; }
+.btn:hover { border-color: var(--accent); }
+.btn--solid { background: var(--sand-light); color: var(--basalt); border-color: var(--sand-light); }
+.btn--solid:hover { background: #fff; border-color: #fff; }
+.btn--accent { border-color: var(--accent); color: var(--accent); }
+
+/* ---- Maisons -------------------------------------------------------------------- */
+.houses { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: clamp(2rem, 5vh, 4rem); }
+@media (min-width: 640px) { .houses { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .houses { grid-template-columns: repeat(3, 1fr); } }
+.house { background: rgba(11, 9, 8, 0.86); padding: clamp(22px, 3vw, 40px); display: grid; gap: 18px; align-content: start; min-height: 300px; transition: background 300ms; }
+.house:hover { background: rgba(19, 15, 13, 0.94); }
+.house__emblem { width: 72px; height: 72px; color: var(--sand); }
+.house:hover .house__emblem { color: var(--accent); }
+.house__kind { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.22em; color: var(--amber); text-transform: uppercase; }
+.house__name { font-family: var(--font-caps); font-stretch: 112%; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase; font-size: 0.95rem; }
+.house__line { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; line-height: 1.3; color: var(--text); }
+.house__text { font-size: 0.95rem; line-height: 1.55; color: var(--muted); }
+
+/* ---- Sietch (console Mentat) ----------------------------------------------------- */
+.console { --c: var(--amber); border: 1px solid rgba(242, 181, 68, 0.28); background: rgba(6, 5, 4, 0.9); font-family: var(--font-mono); color: var(--text); position: relative; }
+.console__bar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid rgba(242, 181, 68, 0.22); font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c); }
+.console__bar b { font-weight: 500; }
+.console__blink { display: inline-block; width: 7px; height: 11px; background: var(--c); margin-left: 6px; animation: blink 1.1s steps(2) infinite; vertical-align: -1px; }
+@keyframes blink { to { opacity: 0; } }
+.console__tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: thin; border-bottom: 1px solid rgba(242, 181, 68, 0.22); }
+.console__tab { flex: 0 0 auto; min-height: 48px; padding: 0 18px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); border-right: 1px solid rgba(242, 181, 68, 0.12); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap;  transition: color 200ms, border-color 200ms, background 200ms;}
+.console__tab:hover { color: var(--text); }
+.console__tab[aria-selected="true"] { color: var(--c); border-bottom-color: var(--c); }
+.console__panel { padding: clamp(18px, 3vw, 36px); }
+.console__panel[hidden] { display: none; }
+.console__intro { font-family: var(--font-caps); font-size: 1rem; line-height: 1.6; max-width: 46rem; color: var(--text); margin-bottom: 1.6rem; }
+.console__grid { display: grid; gap: 1px; background: rgba(242, 181, 68, 0.14); border: 1px solid rgba(242, 181, 68, 0.14); }
+@media (min-width: 760px) { .console__grid { grid-template-columns: repeat(2, 1fr); } .console__grid--3 { grid-template-columns: repeat(3, 1fr); } }
+.card { background: rgba(8, 6, 5, 0.96); padding: 20px 22px; display: grid; gap: 10px; align-content: start; }
+.card__k { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c); }
+.card__t { font-family: var(--font-caps); font-weight: 500; font-size: 1.08rem; letter-spacing: 0.02em; line-height: 1.25; }
+.card__m { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); }
+.card__p { font-family: var(--font-caps); font-size: 0.93rem; line-height: 1.55; color: var(--text); }
+.card__links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; }
+.card__links a, .link-out { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c); text-decoration: none; border-bottom: 1px solid rgba(242, 181, 68, 0.35); padding: 6px 0; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; }
+.card__links a:hover, .link-out:hover { border-bottom-color: var(--c); }
+.card__links a::after, .link-out::after { content: "↗"; font-size: 0.8em; }
+.card--featured { grid-column: 1 / -1; border-left: 2px solid var(--c); }
+.dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; font-size: 0.78rem; letter-spacing: 0.06em; }
+.dl dt { color: var(--c); text-transform: uppercase; font-size: 0.62rem; letter-spacing: 0.2em; padding-top: 3px; }
+.dl dd { margin: 0; color: var(--text); font-family: var(--font-caps); font-size: 0.92rem; letter-spacing: 0; }
+.tag { display: inline-block; padding: 3px 8px; border: 1px solid rgba(242, 181, 68, 0.3); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c); }
+.news { display: grid; gap: 1px; background: rgba(242, 181, 68, 0.12); }
+.news li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 16px; padding: 14px 18px; background: rgba(8, 6, 5, 0.96); font-size: 0.86rem; align-items: baseline; }
+.news time { font-size: 0.68rem; letter-spacing: 0.14em; color: var(--c); }
+.news p { margin: 0; font-family: var(--font-caps); font-size: 0.93rem; max-width: none; }
+.steps { counter-reset: s; display: grid; gap: 1px; background: rgba(242, 181, 68, 0.12); }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 3rem 1fr; gap: 10px; padding: 16px 18px; background: rgba(8, 6, 5, 0.96); }
+.steps li::before { content: counter(s, decimal-leading-zero); font-size: 0.78rem; color: var(--c); letter-spacing: 0.1em; }
+.steps b { display: block; font-family: var(--font-caps); font-weight: 500; font-size: 1rem; margin-bottom: 4px; }
+.steps span { font-family: var(--font-caps); font-size: 0.9rem; color: var(--muted); }
+
+/* Carte d'Arrakis */
+.map { display: grid; gap: 18px; }
+@media (min-width: 900px) { .map { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
+.map__svg { width: 100%; height: auto; border: 1px solid rgba(242, 181, 68, 0.2); background: #080605; }
+.map__spot { cursor: pointer; }
+.map__spot circle:not(.map__hit) { fill: rgba(242, 181, 68, 0.12); stroke: var(--amber); stroke-width: 1; transition: fill 200ms, r 200ms; }
+.map__spot .map__hit { fill: transparent; stroke: none; pointer-events: all; }
+.map__spot:hover circle:not(.map__hit), .map__spot:focus-visible circle:not(.map__hit), .map__spot[aria-pressed="true"] circle:not(.map__hit) { fill: rgba(242, 181, 68, 0.55); }
+.map__spot:focus-visible { outline: none; }
+.map__spot:focus-visible circle:not(.map__hit) { stroke-width: 2; }
+.map__spot text { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; fill: var(--sand-light); text-transform: uppercase; pointer-events: all; }
+.map__ring { fill: none; stroke: var(--amber); stroke-width: 1; opacity: 0; transition: opacity 200ms; }
+.map__spot[aria-pressed="true"] .map__ring { opacity: 0.9; animation: ring 1.8s ease-out infinite; }
+@keyframes ring { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(2.2); opacity: 0; } }
+.map__legend { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.map__sheet { border: 1px solid rgba(242, 181, 68, 0.2); padding: 20px 22px; display: grid; gap: 10px; align-content: start; background: rgba(8, 6, 5, 0.96); min-height: 220px; }
+.map__list { display: flex; flex-wrap: wrap; gap: 8px; }
+.map__list button { padding: 8px 10px; border: 1px solid rgba(242, 181, 68, 0.22); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); min-height: 36px;  transition: color 200ms, border-color 200ms, background 200ms;}
+.map__list button[aria-pressed="true"] { color: var(--c); border-color: var(--c); }
+
+/* Chronologie */
+.timeline { position: relative; display: grid; gap: 0; padding-left: 20px; border-left: 1px solid rgba(242, 181, 68, 0.3); }
+.timeline li { position: relative; padding: 14px 0 18px 18px; display: grid; gap: 6px; }
+.timeline li::before { content: ""; position: absolute; left: -24px; top: 22px; width: 7px; height: 7px; background: var(--basalt); border: 1px solid var(--amber); transform: rotate(45deg); }
+.timeline li[data-key="true"]::before { background: var(--amber); }
+.timeline time { font-size: 0.72rem; letter-spacing: 0.18em; color: var(--c); text-transform: uppercase; }
+.timeline b { font-family: var(--font-caps); font-weight: 500; font-size: 1.02rem; }
+.timeline span { font-family: var(--font-caps); font-size: 0.9rem; color: var(--muted); max-width: 42rem; }
+.timeline__scale { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+/* ---- Prescience ----------------------------------------------------------------- */
+.veil { position: fixed; inset: 0; z-index: 15; pointer-events: none; opacity: 0; transition: opacity 1200ms var(--ease-out); background: radial-gradient(120% 90% at 50% 10%, rgba(143, 168, 255, 0.28), rgba(30, 58, 138, 0.42) 55%, rgba(8, 10, 30, 0.72) 100%); mix-blend-mode: screen; }
+html[data-prescience="on"] .veil { opacity: 1; }
+html[data-prescience="on"] .veil::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 4px); }
+html[data-prescience="on"] #world { filter: saturate(0.4) hue-rotate(190deg) brightness(0.8); }
+.releases { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: clamp(2rem, 5vh, 4rem); }
+@media (min-width: 760px) { .releases { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .releases { grid-template-columns: repeat(3, 1fr); } }
+.release { background: rgba(11, 9, 8, 0.88); padding: clamp(20px, 3vw, 34px); display: grid; gap: 12px; align-content: start; }
+.release__k { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+.release__t { font-family: var(--font-caps); font-weight: 500; font-size: 1.15rem; line-height: 1.25; }
+.release__d { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; color: var(--muted); }
+.release__count { font-family: var(--font-mono); font-size: clamp(1.1rem, 2vw, 1.5rem); letter-spacing: 0.08em; font-variant-numeric: tabular-nums; color: var(--text); display: flex; gap: 14px; flex-wrap: wrap; }
+.release__count small { display: block; font-size: 0.58rem; letter-spacing: 0.22em; color: var(--muted); }
+.release__count[data-state="past"] { color: var(--muted); font-size: 0.9rem; }
+.release__note { font-size: 0.86rem; color: var(--muted); line-height: 1.5; }
+.release__links a { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--line-strong); padding: 6px 0; display: inline-block; }
+.prescience__toggle { display: inline-flex; gap: 14px; flex-wrap: wrap; margin-top: 1.5rem; }
+
+/* ---- Message du ver ------------------------------------------------------------- */
+.toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translate(-50%, 20px); z-index: 40; max-width: min(38rem, 90vw); padding: 16px 48px 16px 20px; background: rgba(11, 9, 8, 0.92); border: 1px solid var(--line-strong); font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; line-height: 1.35; opacity: 0; visibility: hidden; transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out), visibility 0s linear 500ms; }
+.toast[data-open="true"] { opacity: 1; transform: translate(-50%, 0); visibility: visible; transition-delay: 0s; }
+.toast small { display: block; margin-top: 8px; font-family: var(--font-mono); font-style: normal; font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); }
+.toast button { position: absolute; top: 6px; right: 8px; width: 36px; height: 36px; font-family: var(--font-mono); color: var(--muted); }
+/* Le tremblement porte sur le monde (calques fixes), jamais sur body : un transform sur body ferait de lui le bloc
+   conteneur de tout élément fixe (canvas, voile, console), qui sauterait hors de l'écran. */
+html[data-worm="near"] #world, html[data-worm="near"] .still-world { animation: tremble 160ms linear infinite; }
+@keyframes tremble { 0% { transform: translate(0, 0); } 25% { transform: translate(0.6px, -0.4px); } 50% { transform: translate(-0.5px, 0.5px); } 75% { transform: translate(0.4px, 0.6px); } 100% { transform: translate(0, 0); } }
+
+/* ---- Pied de page : nuit aux deux lunes ------------------------------------------- */
+.footer { position: relative; z-index: 1; overflow: hidden; padding: clamp(100px, 20vh, 220px) var(--gutter) clamp(40px, 6vh, 64px); background: linear-gradient(to bottom, rgba(11, 9, 8, 0) 0%, #0a0c1c 30%, #06070f 100%); color: var(--sand-light); }
+.footer__sky { position: absolute; inset: 0; pointer-events: none; }
+.footer__moon { position: absolute; border-radius: 50%; background: radial-gradient(circle at 38% 36%, #f4ead6, #c9b89a 58%, #8d7f68 100%); box-shadow: 0 0 60px rgba(244, 234, 214, 0.18); }
+.footer__moon--big { width: clamp(90px, 12vw, 180px); height: clamp(90px, 12vw, 180px); right: 12%; top: 10%; }
+.footer__moon--small { width: clamp(34px, 4vw, 60px); height: clamp(34px, 4vw, 60px); right: 32%; top: 24%; opacity: 0.85; background: radial-gradient(circle at 40% 40%, #e9e1d2, #a89a84 60%, #6d6252 100%); }
+.footer__dunes { position: absolute; left: 0; right: 0; bottom: 0; height: 42%; color: #0d1326; }
+.footer__inner { position: relative; display: grid; gap: 2.4rem; max-width: 72rem; }
+.footer__grid { display: grid; gap: 2rem; }
+@media (min-width: 820px) { .footer__grid { grid-template-columns: 1.3fr 1fr 1fr; } }
+.footer__col { display: grid; gap: 10px; align-content: start; }
+.footer__col a { text-decoration: none; font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sand-light); padding: 6px 0; display: inline-block; }
+.footer__col a:hover { color: var(--accent); }
+.footer__disclaimer { font-size: 0.86rem; line-height: 1.55; color: var(--sand-dim); max-width: 48rem; }
+.footer__bottom { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: baseline; justify-content: space-between; border-top: 1px solid rgba(234, 216, 182, 0.14); padding-top: 20px; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sand-dim); }
+.footer__bottom a { color: var(--sand-light); text-decoration: none; border-bottom: 1px solid rgba(234, 216, 182, 0.3); }
+.footer__bottom a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ---- Pages secondaires -------------------------------------------------------- */
+.page { position: relative; z-index: 1; padding: clamp(96px, 16vh, 180px) var(--gutter) clamp(80px, 12vh, 140px); max-width: 64rem; }
+.page__back { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: inline-flex; gap: 10px; align-items: center; min-height: 44px; }
+.page__back:hover { color: var(--accent); }
+.page h1 { margin: 1rem 0 2rem; }
+.page h2 { font-family: var(--font-caps); font-stretch: 112%; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase; font-size: 0.85rem; color: var(--amber); margin: 2.6rem 0 1rem; }
+.page p, .page li { max-width: var(--measure); }
+.page ul { display: grid; gap: 8px; }
+.page li { padding-left: 18px; position: relative; }
+.page li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 6px; height: 1px; background: var(--amber); }
+.lexicon { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+@media (min-width: 760px) { .lexicon { grid-template-columns: repeat(2, 1fr); } }
+.lexicon div { background: rgba(11, 9, 8, 0.9); padding: 18px 20px; display: grid; gap: 6px; }
+.lexicon dt { font-family: var(--font-caps); font-stretch: 112%; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; font-size: 0.82rem; color: var(--amber); }
+.lexicon dd { margin: 0; font-size: 0.95rem; line-height: 1.55; color: var(--text); }
+.lexicon dd small { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+
+/* ---- Mouvement réduit : version calme, statique, complète --------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  html[data-worm="near"] #world, html[data-worm="near"] .still-world { animation: none !important; }
+  .scene--tall, .scene--mid { min-height: 100vh; min-height: 100svh; }
+  .scene__sticky { position: relative; }
+  .hud--alt { opacity: 1; transform: none; }
+}
+html[data-motion="reduce"] .scene--tall, html[data-motion="reduce"] .scene--mid { min-height: 100vh; min-height: 100svh; }
+html[data-motion="reduce"] .scene__sticky { position: relative; }
+
+@media (max-width: 640px) {
+  .scene__sticky { padding-top: 14vh; padding-bottom: 20vh; }
+  .hud--alt { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); left: var(--gutter); padding: 6px 10px; gap: 0; }
+  .hud__label, .hud__phase { display: none; }
+  .hud__value { font-size: 0.88rem; }
+  .toast { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 60px); } /* au-dessus de la plaque d'altitude */
+  .descent-veil { background: linear-gradient(to top, rgba(11, 9, 8, 0.8) 0%, rgba(11, 9, 8, 0.58) 35%, rgba(11, 9, 8, 0.48) 65%, rgba(11, 9, 8, 0.48) 100%); } /* C2 : +6 points au tiers haut (épigraphe du désert à 4,18 en plein jour sans le halo) */
+  .epigraph { font-size: 1.45rem; }
+  .monument { letter-spacing: 0.22em; }
+  .hero__hint { margin-top: 2rem; }
+  .news li { grid-template-columns: 1fr; gap: 4px; }
+  .dl { grid-template-columns: 1fr; gap: 2px 0; }
+  .dl dd { margin-bottom: 8px; }
+}
+@media (forced-colors: active) { .house, .card, .release { border: 1px solid CanvasText; } }
+.epigraph p { margin: 0; max-width: none; }
+
+/* ---- Lenis ----------------------------------------------------------------------- */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+html.intro-open { overflow: hidden; }
+
+/* ---- Monde calme (repli) : couches fondues selon la scène ------------------------- */
+.sw { position: absolute; inset: 0; opacity: 0; transition: opacity 1400ms var(--ease-out); }
+.sw--space { opacity: 1; background:
+  radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.9) 50%, transparent 51%),
+  radial-gradient(1px 1px at 72% 12%, rgba(255,255,255,.7) 50%, transparent 51%),
+  radial-gradient(1.5px 1.5px at 38% 42%, rgba(255,255,255,.8) 50%, transparent 51%),
+  radial-gradient(1px 1px at 88% 58%, rgba(255,255,255,.6) 50%, transparent 51%),
+  radial-gradient(1px 1px at 52% 78%, rgba(255,255,255,.75) 50%, transparent 51%),
+  radial-gradient(1.5px 1.5px at 22% 66%, rgba(255,255,255,.5) 50%, transparent 51%),
+  radial-gradient(1px 1px at 64% 30%, rgba(255,255,255,.55) 50%, transparent 51%),
+  radial-gradient(120% 70% at 50% 130%, #7a4a1f 0%, #3a2210 30%, #0b0908 62%);
+  background-color: #05040a; }
+.sw--planet { background: radial-gradient(90% 60% at 50% 125%, #e2bf86 0%, #b8742a 22%, #5a3314 42%, rgba(11,9,8,0) 60%), #0a0810; }
+.sw--storm { background: linear-gradient(to bottom, #3a2412, #8a5a2a 55%, #5a3a1e); }
+.sw--storm::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(115deg, rgba(0,0,0,.14) 0 6px, rgba(255,255,255,.04) 6px 14px); opacity: .7; }
+.sw--dunes svg { width: 100%; height: 100%; }
+.sw--spice { background: radial-gradient(70% 50% at 50% 70%, rgba(232,101,26,.55) 0%, rgba(120,50,10,.5) 40%, #0b0908 75%); }
+.sw--rock { background: linear-gradient(to bottom, #0b0908, #130f0d 60%, #0b0908); }
+.sw--rock::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(242,181,68,.05) 0 1px, transparent 1px 48px); }
+.sw--night { background: linear-gradient(to bottom, #04050c, #0a0c1c 60%, #06070f); }
+html[data-section="orbite"] .sw--space { opacity: 1; }
+html[data-section="orbite"] .sw--planet { opacity: .5; } /* version calme : le limbe de la planète sous le héro, comme dans le monde rendu */
+html[data-section="entree"] .sw--space, html[data-section="entree"] .sw--planet { opacity: 1; }
+html[data-section="entree"] .sw--storm { opacity: .55; }
+html[data-section="desert"] .sw--dunes { opacity: 1; }
+html[data-section="epice"] .sw--dunes { opacity: .7; }
+html[data-section="epice"] .sw--spice { opacity: 1; }
+html[data-section="maisons"] .sw--rock, html[data-section="sietch"] .sw--rock { opacity: 1; }
+html[data-section="prescience"] .sw--night, html[data-section="fin"] .sw--night { opacity: 1; }
+html[data-sky="day"] .sw--dunes { filter: brightness(1.25) saturate(.9); }
+html[data-sky="dusk"] .sw--dunes { filter: hue-rotate(-8deg) brightness(.95); }
+
+/* ---- Grain de la tempête : un bruit SVG statique, visible pendant l'entrée atmosphérique ----------- */
+.grain { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1200ms var(--ease-out); mix-blend-mode: overlay; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.75 0 0 0 0 0.55 0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); background-size: 220px 220px; }
+html[data-section="entree"] .grain { opacity: 0.55; }
+html[data-section="desert"] .grain { opacity: 0.18; }
+@media (prefers-reduced-motion: reduce) { .grain { display: none; } }
+
+/* Polices sous-ensemblées (C2) : Archivo n'est servi qu'en graisses 300–500 ; le gras sémantique reste 500, jamais un gras synthétique. */
+b, strong { font-weight: 500; }
+
+/* ---- Lexique explorable (C2 ; ex-app/lexique/lexique.css, fondu ici pour éviter un chunk CSS préchargé et inutilisé) ---- */
+/* ---- Lexique : recherche et filtres « Console Mentat » ------------------------------------------
+   Monospace, ambre sur basalte, lignes fines. Contrastes sur basalte : ambre 10,8:1, ambre atténué 6,1:1,
+   atténué 7,5:1, texte 14:1. Le contour de focus vient de :focus-visible (globals). */
+.lexique { margin: 2.4rem 0 0; border: 1px solid rgba(242, 181, 68, 0.28); background: rgba(6, 5, 4, 0.9); font-family: var(--font-mono); color: var(--text); }
+.lexique__bar { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid rgba(242, 181, 68, 0.22); font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); }
+.lexique__bar b { font-weight: 500; }
+.lexique__nowrap { white-space: nowrap; }
+.lexique__blink { display: inline-block; width: 7px; height: 11px; margin-left: 6px; background: var(--amber); vertical-align: -1px; animation: lexique-blink 1.1s steps(2) infinite; }
+@keyframes lexique-blink { to { opacity: 0; } }
+
+.lexique__search { padding: 18px 18px 6px; }
+.lexique__label { display: block; margin-bottom: 8px; font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+.lexique__field { position: relative; display: flex; align-items: center; }
+.lexique__prompt { position: absolute; left: 14px; color: var(--amber); font-size: 1.15rem; line-height: 1; pointer-events: none; }
+.lexique__input { width: 100%; min-height: 48px; padding: 0 14px 0 34px; border: 1px solid var(--line-strong); border-radius: 0; background: var(--basalt); color: var(--amber); font: inherit; font-size: 1rem; letter-spacing: 0.04em; appearance: none; -webkit-appearance: none; }
+.lexique__input::placeholder { color: var(--muted); opacity: 1; }
+.lexique__input:hover { border-color: rgba(242, 181, 68, 0.5); }
+.lexique__input:focus-visible { border-color: var(--amber); }
+
+.lexique__filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 18px; }
+.lexique__filter { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); background: transparent; color: var(--muted); font: inherit; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; transition: border-color 200ms, color 200ms, background 200ms; }
+.lexique__filter:hover { color: var(--text); border-color: var(--line-strong); }
+.lexique__filter small { font-size: 0.66rem; letter-spacing: 0.1em; color: var(--amber-dim); }
+.lexique__filter[aria-pressed="true"] { color: var(--amber); border-color: var(--amber); background: rgba(242, 181, 68, 0.08); }
+.lexique__filter[aria-pressed="true"] small { color: var(--amber); }
+
+.lexique__status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; padding: 10px 18px 14px; border-top: 1px solid rgba(242, 181, 68, 0.14); }
+.lexique__count { margin: 0; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+.lexique__reset { min-height: 44px; padding: 0 14px; border: 1px solid var(--line-strong); background: transparent; color: var(--text); font: inherit; font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; transition: border-color 200ms, color 200ms; }
+.lexique__reset:hover { border-color: var(--accent); color: var(--accent); }
+
+.lexique__h2-count { color: var(--muted); letter-spacing: 0.18em; }
+.lexique__empty { margin: 2.4rem 0 0; padding: 22px 20px; border: 1px dashed var(--line-strong); }
+.lexique__empty-title { margin: 0 0 0.6rem; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+.lexique__empty .prose { margin: 0; }
+
+/* Occurrences cherchées et terme ciblé par une ancre (#arrakis). */
+.lexicon mark { background: rgba(242, 181, 68, 0.18); color: inherit; box-shadow: 0 1px 0 var(--amber); }
+.lexicon div { scroll-margin-top: 24px; }
+.lexicon div:target { box-shadow: inset 3px 0 0 var(--amber); }
+
+@media (max-width: 640px) {
+  .lexique__bar, .lexique__search, .lexique__filters, .lexique__status { padding-left: 14px; padding-right: 14px; }
+  .lexique__filter { flex: 1 1 auto; justify-content: space-between; }
+  .lexique__reset { flex: 1 1 100%; }
+  .lexique__hint { display: none; } /* l'indication est reprise dans le message « aucun terme » */
+}
+@media (forced-colors: active) {
+  .lexique__filter[aria-pressed="true"] { border: 2px solid Highlight; } /* état pressé par la bordure : le contour de :focus-visible reste libre et visible */
+}
+
+/* ---- Page 404 (C2 ; ex-app/not-found.css, idem) ---- */
+/* ---- 404 « Hors des cartes » : basalte, quadrillage d'une carte qui s'efface, relevé Mentat ------------------
+   Tout est statique (aucune animation) : identique en mouvement réduit. */
+.nf { min-height: 100vh; min-height: 100svh; box-sizing: border-box; }
+.nf::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(242, 181, 68, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(242, 181, 68, 0.07) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(75% 65% at 28% 32%, #000 0%, transparent 100%);
+  mask-image: radial-gradient(75% 65% at 28% 32%, #000 0%, transparent 100%);
+}
+.nf__index { display: flex; align-items: center; gap: 0.55em; margin: 0; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.nf__nul { flex: none; }
+.nf .nf__epigraph { margin: 1.6rem 0 2.2rem; max-width: 28ch; font-size: clamp(1.35rem, 2.6vw, 2.1rem); }
+.nf__readout { display: grid; gap: 6px; width: max-content; max-width: 100%; margin: 0 0 2rem; padding: 14px 16px; border: 1px solid rgba(242, 181, 68, 0.28); background: rgba(6, 5, 4, 0.9); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.nf__readout div { display: flex; flex-wrap: wrap; gap: 0 10px; }
+.nf__readout dt { color: var(--muted); }
+.nf__readout dt::after { content: " —"; }
+.nf__readout dd { margin: 0; color: var(--amber); }
+.nf__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; max-width: none; }
+@media (forced-colors: active) { .nf::before { display: none; } }
+
+/* ---- Console du Sietch enrichie (C2 ; ex-components/sietch/sietch.css), fondu ici : un seul fichier CSS, aucun chunk préchargé inutilement ---- */
+/* Sietch — console Mentat, lot C2 : compte à rebours de la Troisième Partie, guide de lecture interactif, « par où
+   commencer » du jeu, repère « vous êtes ici » de la chronologie. Jetons et classes de base dans app/globals.css
+   (ambre `--c` posé sur .console, monospace, lignes fines). Importé par components/sietch/Console.tsx. */
+
+/* ---- Bandeau « J−N » sous la barre de la console -------------------------------------------------------- */
+.ticker { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; width: 100%; padding: 10px 18px; border-bottom: 1px solid rgba(242, 181, 68, 0.22); background: rgba(242, 181, 68, 0.05); font-family: var(--font-mono); color: var(--text); text-align: left; }
+button.ticker { transition: background 200ms; }
+button.ticker:hover { background: rgba(242, 181, 68, 0.11); }
+.ticker__k { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c); }
+.ticker__j { font-weight: 500; font-size: 0.92rem; letter-spacing: 0.08em; color: var(--c); font-variant-numeric: tabular-nums; }
+.ticker__t { font-family: var(--font-caps); font-size: 0.9rem; letter-spacing: 0; }
+.ticker__t time { color: var(--text); }
+.ticker__go { margin-left: auto; font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c); }
+@media (max-width: 640px) { .ticker__go { margin-left: 0; } }
+
+/* ---- Compte à rebours dans la fiche du film (onglet Films) ---------------------------------------------- */
+.ptc { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid rgba(242, 181, 68, 0.22); background: rgba(242, 181, 68, 0.04); }
+.ptc__row { display: flex; flex-wrap: wrap; gap: 10px 32px; }
+.ptc__cell { display: grid; gap: 3px; }
+.ptc__n { font-family: var(--font-mono); font-size: clamp(1.4rem, 2.4vw, 1.9rem); line-height: 1.1; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--c); min-width: 3ch; }
+.ptc__cell small { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+
+/* ---- Guide de lecture interactif (onglet Livres) -------------------------------------------------------- */
+.guide { display: grid; gap: 1px; background: rgba(242, 181, 68, 0.14); border: 1px solid rgba(242, 181, 68, 0.14); }
+@media (min-width: 900px) { .guide { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+.guide__questions { background: rgba(8, 6, 5, 0.96); padding: 20px 22px; display: grid; gap: 18px; align-content: start; }
+.guide__label { display: flex; gap: 10px; align-items: baseline; margin: 0 0 10px; font-family: var(--font-caps); font-size: 0.98rem; font-weight: 500; max-width: none; }
+.guide__n { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; color: var(--c); }
+.guide__opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.guide__opt { min-height: 40px; padding: 8px 14px; border: 1px solid rgba(242, 181, 68, 0.28); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); text-align: left; transition: border-color 200ms, background 200ms, color 200ms; }
+.guide__opt:hover { border-color: var(--c); }
+.guide__opt[aria-pressed="true"] { background: var(--c); color: var(--basalt); border-color: var(--c); }
+.guide__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(242, 181, 68, 0.14); }
+.guide__progress { font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.guide__reset { min-height: 36px; padding: 0 12px; border: 1px solid rgba(242, 181, 68, 0.22); font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text); transition: border-color 200ms, color 200ms; }
+.guide__reset:not(:disabled):hover { color: var(--c); border-color: var(--c); }
+.guide__reset:disabled { opacity: 0.4; cursor: default; }
+/* La zone de résultat réserve sa hauteur : la recommandation apparaît en fondu, rien ne saute. */
+.guide__result { background: rgba(8, 6, 5, 0.96); padding: 20px 22px; min-height: 240px; display: grid; align-content: start; border-left: 2px solid transparent; transition: border-color 300ms; }
+.guide__result:has(.guide__rec) { border-left-color: var(--c); }
+.guide__rec, .guide__empty { display: grid; gap: 8px; align-content: start; }
+.guide__rec { animation: guide-in 500ms var(--ease-out) both; }
+@keyframes guide-in { from { opacity: 0; } to { opacity: 1; } }
+.guide__title { font-family: var(--font-caps); font-weight: 500; font-size: 1.3rem; letter-spacing: 0.02em; line-height: 1.2; }
+.guide__k { margin-top: 8px; }
+.guide__order { padding-left: 1.6rem; list-style: decimal-leading-zero; display: grid; gap: 4px; font-family: var(--font-caps); font-size: 0.92rem; line-height: 1.45; color: var(--text); }
+.guide__order li::marker { color: var(--c); font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; }
+.guide__result .card__p, .guide__result .card__m { margin: 0; }
+/* Le parcours classique en cinq étapes, replié sous le guide (lisible sans JavaScript, toujours là). */
+.guide__classic { margin-top: 14px; border: 1px solid rgba(242, 181, 68, 0.14); }
+.guide__classic summary { cursor: pointer; padding: 12px 16px; font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--c); list-style: none; display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.guide__classic summary::-webkit-details-marker { display: none; }
+.guide__classic summary::before { content: "+"; font-size: 0.9rem; width: 1em; }
+.guide__classic[open] summary::before { content: "−"; }
+.guide__classic .steps { border-top: 1px solid rgba(242, 181, 68, 0.14); }
+
+/* ---- « Par où commencer » du jeu (onglet Dune: Awakening) ----------------------------------------------- */
+.start { counter-reset: st; display: grid; gap: 12px; }
+.start li { counter-increment: st; display: grid; grid-template-columns: 2rem 1fr; gap: 6px; align-items: start; }
+.start li::before { content: counter(st, decimal-leading-zero); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; color: var(--c); padding-top: 8px; }
+.start p { margin: 2px 0 0; }
+
+/* ---- Repère « vous êtes ici » de la chronologie ------------------------------------------------------- */
+.timeline li[data-here="true"] { background: linear-gradient(to right, rgba(242, 181, 68, 0.1), rgba(242, 181, 68, 0)); margin-left: -18px; padding-left: 36px; }
+.timeline li[data-here="true"]::before { left: -6px; background: var(--amber); box-shadow: 0 0 0 4px rgba(242, 181, 68, 0.25); }
+.timeline .timeline__here { display: inline-flex; align-items: center; gap: 8px; width: max-content; max-width: 100%; padding: 4px 10px; border: 1px solid var(--amber); font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.timeline .timeline__here i { width: 6px; height: 6px; flex: 0 0 auto; background: var(--amber); transform: rotate(45deg); }
+
+@media (forced-colors: active) {
+  .guide__opt[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .ptc, .guide__result, .timeline__here { border: 1px solid CanvasText; }
+}
+
+
+/* ---- Emplacements d'images (C2 ; ex-components/world/media.css), fondu ici : un seul fichier CSS, aucun chunk préchargé inutilement ---- */
+/* Images déposées par Johan (docs/medias.md), superposées dans les couches du monde calme, en fond de section et dans
+   les fiches de la carte. Aucune animation ici : les fondus viennent de l'opacité des couches (app/globals.css), déjà
+   coupés en mouvement réduit. Sans fichier, aucune de ces règles ne s'applique : le rendu procédural est intact. */
+
+/* ---- Monde calme : une image par couche, cadrée plein écran ------------------------------------------------- */
+.sw__img { object-fit: cover; }
+/* Texture de la planète (emplacement 2) : masquée en disque, aux mêmes proportions que le limbe en dégradé qu'elle habille. */
+.sw--planet .sw__img {
+  -webkit-mask-image: radial-gradient(90% 60% at 50% 125%, #000 0%, #000 44%, transparent 58%);
+  mask-image: radial-gradient(90% 60% at 50% 125%, #000 0%, #000 44%, transparent 58%);
+}
+/* Repli téléphone (emplacement 12) sans image horizontale : rien à l'horizontale, l'image verticale en hauteur. */
+@media (orientation: landscape) { .sw__img--portrait { display: none; } }
+
+/* ---- Fond de section (MediaBackdrop) : sous le voile (.scene__veil, z-index -1) et sous le contenu ------------- */
+.backdrop { position: absolute; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+.backdrop__img { object-fit: cover; }
+/* Toute la section, bords fondus pour ne créer aucune couture avec le monde derrière. */
+.backdrop--fill {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+}
+/* L'entrée de la section seulement : un écran de haut, fondu vers le bas. */
+.backdrop--top {
+  bottom: auto;
+  height: min(100vh, 100%);
+  height: min(100svh, 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+}
+
+/* ---- Carte d'Arrakis : vignette d'une fiche ------------------------------------------------------------------- */
+.map__photo { position: relative; margin: 0; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(242, 181, 68, 0.2); background: #080605; }
+.map__photo img { object-fit: cover; }
+
+/* ---- Carte d'Arrakis plus vivante (C2) : le sable des dunes du sud dérive lentement, le vent du bassin du nord souffle ---- */
+.map__dune { animation: map-drift 26s linear infinite; }
+.map__wind { animation: map-drift 9s linear infinite; }
+@keyframes map-drift { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -24; } }
+

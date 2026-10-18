@@ -1,0 +1,13 @@
+import { chromium } from "@playwright/test";
+const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const errs = [];
+page.on("console", (m) => { if (["error", "warning"].includes(m.type()) && !/GL Driver|swiftshader|GroupMarker/.test(m.text())) errs.push(m.type() + ": " + m.text().slice(0, 400)); });
+page.on("pageerror", (e) => errs.push("PAGEERROR " + e.message.slice(0, 300)));
+await page.goto("http://127.0.0.1:3100/?ciel=nuit", { waitUntil: "networkidle" });
+console.log("sky:", await page.evaluate(() => document.documentElement.dataset.sky), "| boot:", await page.evaluate(() => document.querySelector("head script:not([src])")?.textContent?.includes("ciel")));
+await page.getByRole("button", { name: "Entrer en silence" }).click();
+await page.waitForTimeout(3000);
+console.log("world:", await page.evaluate(() => document.documentElement.dataset.world));
+console.log(errs.length ? errs.join("\n") : "aucune erreur");
+await browser.close();
