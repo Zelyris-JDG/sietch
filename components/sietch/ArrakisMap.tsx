@@ -1,13 +1,29 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { PLACES } from "../../src/content/sietch";
+import { MEDIA_BY_ID, type MediaId, type MediaPaths } from "../../src/config/media";
 import { Term } from "../ui/Term";
+import "../world/media.css";
 
-/** Carte originale et cliquable d'Arrakis : notre propre projection stylisée, une fiche courte par lieu. */
-export function ArrakisMap() {
+/** Lieu → image de docs/medias.md montrée en vignette dans sa fiche, quand le fichier existe (emplacements 7, 8 et 11). */
+const PLACE_MEDIA: Partial<Record<string, MediaId>> = {
+  "mur-du-bouclier": "shield-wall",
+  "pole-nord": "polar-ice",
+  "pole-sud": "polar-ice",
+  "desert-profond": "rock-outcrop",
+};
+
+/**
+ * Carte originale et cliquable d'Arrakis : notre propre projection stylisée, une fiche courte par lieu.
+ * `images` (facultatif) : chemins publics des images présentes, fournis par le composant serveur (src/lib/media.server.ts).
+ */
+export function ArrakisMap({ images }: { images?: MediaPaths }) {
   const [sel, setSel] = useState(PLACES[1].id);
   const place = PLACES.find((p) => p.id === sel) ?? PLACES[0];
+  const mediaId = PLACE_MEDIA[place.id];
+  const photo = mediaId ? images?.[mediaId] : undefined;
   return (
     <div className="map">
       <div>
@@ -53,6 +69,11 @@ export function ArrakisMap() {
         </div>
       </div>
       <aside className="map__sheet" aria-live="polite">
+        {photo && mediaId && (
+          <figure className="map__photo">
+            <Image src={photo} alt={MEDIA_BY_ID[mediaId].alt} fill sizes="(min-width: 900px) 30vw, 92vw" />
+          </figure>
+        )}
         <span className="card__k">{place.kind}</span>
         <h3 className="card__t">{place.termId ? <Term id={place.termId}>{place.name}</Term> : place.name}</h3>
         <p className="card__p">{place.text}</p>
