@@ -16,7 +16,12 @@ dont l'une est tombée dans une rafale de builds.
 | Avant (feat/v1, 5be01c9) | 66 (66 / 66) | 1,37 s | 3,77 s (3,77 / 3,89) | 1 003 ms (1 003 / 1 053) | 0 | 2,22 s |
 | Après `World.tsx` (détection WebGL au démarrage, veille 20 s) | 82 (82 / 84) | 1,38 s | 3,76 s (3,76 / 3,94) | 178 ms (178 / 312) | 0 | 2,12 s |
 | Essai (non retenu) : `Intro.tsx`, focus différé d'une image | 78 (78 / 82) | 1,38 s | 3,99 s (3,99 / 4,13) | 261 ms (261 / 347) | 0 | 1,93 s |
-| Après, état final (World + correctifs Safari/Firefox) | 82 (passe propre) · 56 (passe sous contention) | 1,38 s | 4,06 s (4,06 / 5,01) | 227 ms (227 / 1 239) | 0 | 2,94 s |
+| Après, état final (World + correctifs Safari/Firefox), 1re série | 82 (passe propre) · 56 (passe sous contention) | 1,38 s | 4,06 s (4,06 / 5,01) | 227 ms (227 / 1 239) | 0 | 2,94 s |
+| Après, état final, 2e série (commit 994ad8f) | 72 (72 / 83) | 1,38 s | 4,03 s (4,03 / 4,05) | 205 ms (205 / 490) | 0 | 2,52 s |
+
+Lecture : le **TBT** est divisé par cinq dès que la machine n'est pas saturée (1 003 → 178–227 ms), le score performance
+suit (66 → 82–83 sur les passes propres) ; le **LCP modélisé ne bouge pas** (3,8–4,0 s, bruit compris) parce qu'il est
+borné par les octets avant le premier rendu (voir plus bas). Le FCP, le CLS (0) et l'élément LCP sont identiques partout.
 
 Élément LCP retenu dans toutes les passes : le **paragraphe du héro** (`div.scene__sticky > div.hero__sub > div.prose > p`,
 68 392 px² en 412 px de large), pas l'intro : l'API LCP ignore l'occlusion, le héro peint sous l'intro opaque reste le plus
