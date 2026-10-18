@@ -264,7 +264,7 @@ export type Release = {
 export const RELEASES: Release[] = [
   { id: "dune-3", kind: "Film", title: "Dune : Troisième Partie", date: "2026-12-16", where: "Sortie en France", note: "États-Unis : 18 décembre 2026. Warner Bros. · Legendary.", links: [{ label: "X · @dunemovie", href: "https://x.com/dunemovie" }] },
   { id: "awakening-japon", kind: "Jeu", title: "Dune: Awakening au Japon", date: "2026-10-29", where: "PS5 et Xbox Series X|S, physique et numérique", links: [{ label: "Site officiel", href: "https://duneawakening.com" }] },
-  { id: "prophecy-s2", kind: "Série", title: "Dune: Prophecy — saison 2", date: null, where: "HBO · date non annoncée", note: "Tournage lancé le 11 novembre 2025 (communiqué Warner Bros. Discovery), huit épisodes. La presse estime une fenêtre fin 2026 – début 2027.", links: [{ label: "Dossier officiel WBD", href: "https://press.wbd.com/na/property/dune-prophecy" }] },
+  { id: "prophecy-s2", kind: "Série", title: "Dune: Prophecy — saison 2", date: null, where: "HBO", note: "Tournage lancé le 11 novembre 2025 (communiqué Warner Bros. Discovery), huit épisodes. La presse estime une fenêtre fin 2026 – début 2027.", links: [{ label: "Dossier officiel WBD", href: "https://press.wbd.com/na/property/dune-prophecy" }] },
   { id: "awakening-consoles", kind: "Jeu", title: "Dune: Awakening sur PS5 et Xbox Series X|S", date: "2026-09-22", where: "Sortie consoles", note: "Mode solo complet, Xbox Game Pass le même jour.", links: [{ label: "Site officiel", href: "https://duneawakening.com" }] },
   { id: "lynch-reprise", kind: "Film", title: "Dune (1984) de retour en salles", date: "2026-05-13", where: "Ressortie en France" },
 ];
