@@ -575,7 +575,9 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       if (portrait) tmp.set(x0 + 9, yStart - 29, 24 - 165); else tmp.set(x0 - 69, yStart - 8, 24 - 156);
       // En sortant, le regard remonte vers la bouche éclairée et le fuseau qu'on quitte (dès le début de la sortie,
       // pour ne jamais le perdre de vue), puis bascule vers la planète.
-      tmp.lerp(wantTarget.set(x0 + (portrait ? 8 : 24), 30, -100), smoothstep(0, 0.9, exitT) * 0.9);
+      // Portrait : le regard remonte moins (cible plus basse et plus à droite) pour que le fuseau reste dans la moitié
+      // supérieure de l'écran pendant la sortie, au-dessus de l'épigraphe et du paragraphe.
+      tmp.lerp(wantTarget.set(x0 + (portrait ? 16 : 24), portrait ? -4 : 30, -100), smoothstep(0, 0.9, exitT) * 0.9);
       tmp.lerp(wantTarget.set(0, -600, -200), look);
       wantTarget.copy(tmp);
       // Planète : loin et basse au début (plus basse en portrait : sous le paragraphe), elle monte pendant l'entrée.
