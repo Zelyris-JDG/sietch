@@ -57,6 +57,9 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 - 2026-10-18 — Plan « Descente » en une page principale ; le Sietch est la partie utile ; Dune: Awakening mis en avant.
 - 2026-10-18 — Polices OFL : Archivo, Cormorant Garamond, IBM Plex Mono (choix de l'agent, réversible).
 - 2026-10-18 — Pas de vidéo réelle en V1 : tout le visuel est procédural (voir H2) ; décision à revoir avec une clé Pexels fournie par Johan.
+- 2026-10-18 — Le long-courrier est un fuseau à anneaux de structure vu depuis sa soute (arceaux), jamais une forme des films, de la série ou du jeu ; le ver n'est jamais montré (bosse, ondes, tremblement, grondement).
+- 2026-10-18 — Un seul voile de lisibilité fixe pour toute la descente (aucune couture entre scènes) ; halo sombre sous les textes clairs ; sections souterraines (Maisons, Sietch, Prescience) sur fond basalte à 80 %.
+- 2026-10-18 — Le monde WebGL n'est jamais sur le chemin critique : chargé à la sortie de l'intro ou après « load ».
 
 ## Hypothèses (prises sans Johan, réversibles)
 
@@ -68,7 +71,10 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 - **H6 — Noms.** Le site s'appelle « Sietch — Le Refuge des fans » ; adresse de production : À définir (sous-domaine `sietch.zelyris.fr` suggéré, comme `laguilde.zelyris.fr`).
 - **H7 — Vercel.** Relier un hébergeur est réservé à Johan (méthode commune, règle « liaison ou réglage d'un hébergeur ») : aucun projet Vercel créé par l'agent. Procédure en fin de résumé ; dès que le projet existe, chaque push de la branche donne une préversion.
 - **H8 — Son.** Tout est généré en direct (aucun fichier audio) : nappe grave, vent, grondement. Coupé par défaut.
-- **H9 — Ciel réel.** Rendu serveur = nuit ; un script inline applique l'heure locale avant le premier rendu (jour 7 h–17 h, crépuscule 17 h–20 h et 5 h–7 h, nuit sinon).
+- **H9 — Ciel réel.** Rendu serveur = nuit ; un script inline applique l'heure locale avant le premier rendu (jour 7 h–17 h, crépuscule 17 h–20 h et 5 h–7 h, nuit sinon). `?ciel=jour|crepuscule|nuit` force le ciel pour tester.
+- **H10 — Marcher sans rythme.** La régularité se mesure sur les gestes (molette, doigt, clavier) des 2,8 dernières secondes, pas sur le défilement lissé ; le ver n'approche que sur le sable (désert, épice) ; message affiché une seule fois (mémorisé), jamais en mouvement réduit.
+- **H11 — Altitude.** Échelle narrative : 1 200 km dans la soute, 400 km en sortie d'orbite, 12 km sous les nuages de poussière, 0 sur le sable, −80 m au fond du Sietch (aucune prétention physique).
+- **H12 — Mentions légales et données personnelles.** Le site ne pose aucun cookie et n'a aucune mesure d'audience ; deux préférences (son, message du ver) restent dans le navigateur. À confirmer par Johan si une mesure d'audience est ajoutée plus tard.
 
 ## Chantiers futurs (NE PAS construire maintenant)
 
@@ -79,10 +85,13 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 
 ## Journal des chantiers
 
-- 2026-10-18 — **C1 (en cours)** : bible, squelette Next.js 16, DA, pied de page légal, descente complète, Sietch, effets signatures. Détail en fin de chantier.
+- 2026-10-18 — **C1 — V1 du Refuge des fans** (branche `claude/sietch-c1-refuge-fans-kd77dr`, miroir `feat/v1`, PR #1 en brouillon, pas de fusion). Bible, squelette Next.js 16 + TypeScript, polices OFL (Archivo, Cormorant Garamond, IBM Plex Mono), direction artistique et pied de page légal ; la descente en sept scènes + pied de page « nuit aux deux lunes » ; compteur d'altitude ; lexique vivant (41 termes, page `/lexique`) ; console Mentat (Dune: Awakening mis en avant, films, livres + guide de lecture, réseaux officiels, carte d'Arrakis cliquable, chronologie de 10 000 ans) ; prescience (voile bleu, comptes à rebours, retour en un clic) ; son généré (nappe, vent, grondement, coupé par défaut, choix mémorisé) ; « marcher sans rythme » (ver qui approche puis s'éloigne, message unique) ; monde three.js en un seul canvas : soute et long-courrier originaux (fuseau à panneaux, anneaux, modules, hublots, feux, frégates), planète en nuanceur, tempête de particules, dunes en relief avec vent et signe du ver, épice, ciel réel (jour / crépuscule / nuit aux deux lunes) ; repli calme (sans WebGL, mouvement réduit, appareil faible) ; three.js chargé après l'intro ou le chargement. Contrôles : typecheck, lint, 9 tests unitaires, build, 15 tests Playwright (bureau + mobile) + test du ver ; captures `docs/captures/v1/` ; Lighthouse mobile simulé : performance 88, accessibilité 98, bonnes pratiques 100, FCP 1,4 s, LCP 3,6 s (délai de rendu modélisé par Lighthouse — mesuré dans un vrai navigateur, le texte du héro est peint à 0,35 s ; à confirmer sur le téléphone de Johan / PageSpeed une fois en préversion), CLS 0, TBT 160 ms.
 
 ## Reste à faire
 
 - Johan : créer le projet Vercel lié au dépôt (H7) et dire « mets en ligne » après validation.
 - Johan : fournir une clé Pexels (gratuite) si l'on veut des vidéos réelles (H2).
 - Johan : générer les images de `docs/medias.md` et les déposer dans `public/images/`.
+- Johan : vérifier sur son téléphone (Android) : fluidité de la descente, le son (nappe, vent, grondement), « marcher sans rythme » au doigt, la lisibilité du héro sur le vaisseau, les infobulles au toucher, le menu des onglets de la console.
+- Johan : cliquer une fois chaque lien officiel de la console (H5) et relire les mentions légales en ligne (H4).
+- C2 (suggestions) : éclairage et détails du long-courrier (ombres portées, feux animés), raccord plus doux tempête → dunes, pied de page WebGL (lunes dans le monde), version anglaise, mesure LCP réelle sur préversion, image de partage mise à jour.
