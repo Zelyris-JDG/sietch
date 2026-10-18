@@ -1,6 +1,6 @@
 /** Capture à une position précise : node scripts/shot-at.mjs --y=0.1 --out=/tmp/x.png [--w=1440 --h=900] (y = fraction de la hauteur de page) */
 import { chromium } from "@playwright/test";
-const a = Object.fromEntries(process.argv.slice(2).map((s) => s.replace(/^--/, "").split("=")));
+const a = Object.fromEntries(process.argv.slice(2).map((s) => { const i = s.indexOf("="); return [s.slice(2, i), s.slice(i + 1)]; }));
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 const page = await browser.newPage({ viewport: { width: +(a.w ?? 1440), height: +(a.h ?? 900) } });
 await page.goto(a.url ?? "http://127.0.0.1:3100/", { waitUntil: "networkidle" });

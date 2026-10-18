@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrakisMap } from "./ArrakisMap";
 import { BooksPanel, FilmsPanel, GamePanel, NetworksPanel, TimelinePanel } from "./panels";
+import { DATA_VERIFIED_LABEL } from "../../src/content/sietch";
 
 const TABS = [
   { id: "jeu", label: "Dune: Awakening" },
@@ -18,12 +19,10 @@ type TabId = (typeof TABS)[number]["id"];
 export function Console() {
   const [tab, setTab] = useState<TabId>("jeu");
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const [stamp, setStamp] = useState("");
 
   useEffect(() => {
     const h = window.location.hash.replace("#", "");
     if (TABS.some((t) => t.id === h)) setTab(h as TabId);
-    setStamp(new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date()));
   }, []);
 
   const onKey = (e: React.KeyboardEvent, i: number) => {
@@ -43,7 +42,7 @@ export function Console() {
     <div className="console">
       <div className="console__bar">
         <span><b>CONSOLE MENTAT</b> · refuge souterrain · accès libre<span className="console__blink" aria-hidden="true" /></span>
-        <span>{stamp ? `MISE À JOUR DES DONNÉES · ${stamp}` : "DONNÉES VÉRIFIÉES · OCTOBRE 2026"}</span>
+        <span>DONNÉES VÉRIFIÉES · {DATA_VERIFIED_LABEL.toUpperCase()}</span>
       </div>
       <div className="console__tabs" role="tablist" aria-label="Rubriques du Sietch">
         {TABS.map((t, i) => (

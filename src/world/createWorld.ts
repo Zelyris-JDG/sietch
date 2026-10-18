@@ -5,7 +5,7 @@
  */
 import * as THREE from "three";
 import { state, clamp01, lerp, smoothstep } from "../lib/store";
-import { DUNE_FRAG, DUNE_VERT, HALO_FRAG, HALO_VERT, PARTICLE_FRAG, PARTICLE_VERT, PLANET_FRAG, PLANET_VERT, SKY_FRAG, SKY_VERT, WIND_VERT } from "./shaders";
+import { DUNE_FRAG, DUNE_VERT, HALO_FRAG, HALO_VERT, HULL_FRAG, HULL_VERT, PARTICLE_FRAG, PARTICLE_VERT, PLANET_FRAG, PLANET_VERT, SKY_FRAG, SKY_VERT, WIND_VERT } from "./shaders";
 
 export type WorldOptions = { tier: "low" | "high" };
 
@@ -104,7 +104,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   // Le long-courrier : un fuseau de 300 unités, des anneaux de structure, une peau de modules, des feux de position.
   const ship = new THREE.Group();
   space.add(ship);
-  const hullMat = keep(new THREE.MeshStandardMaterial({ color: 0x4a3d33, roughness: 0.68, metalness: 0.22, emissive: 0x1a100a, emissiveIntensity: 1.0 }));
+  const hullMat = keep(new THREE.ShaderMaterial({ vertexShader: HULL_VERT, fragmentShader: HULL_FRAG, uniforms: { uSunDir: { value: new THREE.Vector3(-0.89, -0.11, 0.44).normalize() }, uShineDir: { value: new THREE.Vector3(0.1, -1, 0.25).normalize() }, uTime: { value: 0 } } }));
   const ribMat = keep(new THREE.MeshStandardMaterial({ color: 0x8a7462, roughness: 0.55, metalness: 0.25, emissive: 0x2a1608, emissiveIntensity: 0.8 }));
   const profile: THREE.Vector2[] = [];
   const SHIP_L = 320;
@@ -116,12 +116,11 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   const spine = new THREE.Mesh(keep(new THREE.LatheGeometry(profile, high ? 48 : 24)), hullMat);
   spine.rotation.z = Math.PI / 2; // axe long le long de X
   ship.add(spine);
-  const ringGeo = keep(new THREE.TorusGeometry(1, 0.45, 8, high ? 96 : 48));
+  // Anneaux de structure : de vrais tores (jamais un tore mis à l'échelle : son tube deviendrait un disque).
   for (let i = 0; i < 5; i++) {
     const t = (i + 0.5) / 5;
-    const ring = new THREE.Mesh(ringGeo, ribMat);
     const r = 15 + 9 * Math.sin(Math.PI * t);
-    ring.scale.set(r, r, 1);
+    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, 0.7, 8, high ? 96 : 48)), ribMat);
     ring.position.x = (t - 0.5) * SHIP_L;
     ring.rotation.y = Math.PI / 2;
     ship.add(ring);
@@ -185,7 +184,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   ship.add(shipLights);
   // Frégates : minuscules fuseaux près de la coque.
   const frigateCount = 18;
-  const frigates = new THREE.InstancedMesh(keep(new THREE.CapsuleGeometry(0.35, 2.4, 3, 6)), keep(new THREE.MeshStandardMaterial({ color: 0x8a7a6a, roughness: 0.5, metalness: 0.6, emissive: 0x332211 })), frigateCount);
+  const frigates = new THREE.InstancedMesh(keep(new THREE.CapsuleGeometry(0.16, 1.4, 3, 6)), keep(new THREE.MeshStandardMaterial({ color: 0x6a5c50, roughness: 0.6, metalness: 0.4, emissive: 0x1a1008 })), frigateCount);
   const frigateSeeds: number[] = [];
   for (let i = 0; i < frigateCount; i++) {
     frigateSeeds.push(rand() * Math.PI * 2, 30 + rand() * 40, (rand() - 0.5) * SHIP_L * 0.9, 0.2 + rand() * 0.5);
@@ -193,12 +192,10 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   ship.add(frigates);
   // La soute : cinq arceaux horizontaux sous le vaisseau, que la frégate traverse en sortant.
   const bay = new THREE.Group();
-  const bayRingGeo = keep(new THREE.TorusGeometry(1, 1.4, 8, 64));
   const bayMat = keep(new THREE.MeshStandardMaterial({ color: 0x2a221c, roughness: 0.9, metalness: 0.3, emissive: 0x2a1a0a, emissiveIntensity: 0.8 }));
   for (let i = 0; i < 6; i++) {
-    const ring = new THREE.Mesh(bayRingGeo, bayMat);
     const r = 26 + i * 2.5;
-    ring.scale.set(r, r, 1);
+    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, 1.1, 8, 72)), bayMat);
     ring.rotation.x = Math.PI / 2;
     ring.position.set(0, -4 - i * 11, 0);
     bay.add(ring);
@@ -206,11 +203,17 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     lamp.position.set(r * 0.7, -4 - i * 11, 0);
     if (high && i % 2 === 0) bay.add(lamp);
   }
-  bay.position.set(0, 0, 22);
+  bay.position.set(-20, 0, 22);
   space.add(bay);
   // Axe long du vaisseau le long de Z : vu de dessous, il file vers le point de fuite, au-dessus de la planète.
   ship.rotation.y = Math.PI / 2;
   ship.position.set(0, 22, -40);
+  // Diagnostic : ?cache=coque|planete|vaisseau|soute masque un élément (jamais utilisé en production).
+  const hide = new URLSearchParams(window.location.search).get("cache");
+  if (hide === "coque") spine.visible = false;
+  if (hide === "vaisseau") ship.visible = false;
+  if (hide === "planete") { planet.visible = false; halo.visible = false; }
+  if (hide === "soute") bay.visible = false;
 
   const sun = new THREE.DirectionalLight(0xffe7c6, 5.5);
   sun.position.set(-320, -40, 160);
@@ -341,10 +344,11 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       // Caméra : contre-plongée sous la coque, puis descente.
       const yStart = -22, yExit = -96, yOrbit = -420;
       const y = lerp(lerp(yStart, yExit, smoothstep(0, 1, exitT)), yOrbit, smoothstep(0, 1, orbitT) * entryT * 0 + smoothstep(0, 1, orbitT));
-      wantPos.set(Math.sin(exitT * 1.3) * 5, y, 24 + exitT * 18 + orbitT * 30);
+      wantPos.set(-28 + Math.sin(exitT * 1.3) * 5 + orbitT * 20, y, 24 + exitT * 18 + orbitT * 30);
       // Regard : d'abord la coque au-dessus, puis la planète en dessous.
       const look = smoothstep(0.15, 0.9, orbitT);
-      tmp.set(0, 6, -170).lerp(new THREE.Vector3(0, -600, -200), look);
+      const side = camera.aspect < 0.8 ? -26 : 0; // téléphone : le vaisseau se décale, le texte reste lisible
+      tmp.set(18 + side, 10, -150).lerp(new THREE.Vector3(0, -600, -200), look);
       wantTarget.copy(tmp);
       // Planète : loin et basse au début, elle monte vers nous pendant l'entrée.
       const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60;
@@ -354,6 +358,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       planet.rotation.y = time * 0.004;
       halo.rotation.copy(planet.rotation);
       planetMat.uniforms.uTime.value = time;
+      hullMat.uniforms.uTime.value = time;
       planetMat.uniforms.uHaze.value = stormT;
       haloMat.uniforms.uStrength.value = 0.8 + entryT * 0.8;
       // En s'éloignant, le vaisseau glisse de côté et pivote : on le voit de trois quarts, jamais de face.

@@ -2,6 +2,9 @@
  * Données du Sietch (partie utile). Tous les textes sont écrits pour ce site. Chaque fait et chaque lien est
  * vérifié et consigné dans docs/sources.md (dates de vérification). Un lien non vérifié n'est pas publié.
  */
+/** Date de la dernière vérification des faits (docs/sources.md). À mettre à jour à chaque revérification. */
+export const DATA_VERIFIED_LABEL = "18 octobre 2026";
+
 export type Link = { label: string; href: string };
 
 export type Film = {

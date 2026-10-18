@@ -240,3 +240,41 @@ export const WIND_VERT = /* glsl */ `
     gl_Position = projectionMatrix * mv;
   }
 `;
+
+export const HULL_VERT = /* glsl */ `
+  varying vec3 vN; varying vec3 vW; varying vec3 vL;
+  void main() { vN = normalize(normalMatrix * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vL = position; gl_Position = projectionMatrix * viewMatrix * w; }
+`;
+export const HULL_FRAG = /* glsl */ `
+  precision highp float;
+  uniform vec3 uSunDir; uniform vec3 uShineDir; uniform float uTime;
+  varying vec3 vN; varying vec3 vW; varying vec3 vL;
+  ${NOISE}
+  void main() {
+    vec3 n = normalize(vN);
+    /* coordonnées cylindriques du fuseau : le long de l'axe (y local du tour) et autour */
+    float along = vL.y;
+    float ang = atan(vL.z, vL.x);
+    float pa = floor(along / 7.0);
+    float pb = floor(ang / 0.3);
+    float id = hash12(vec2(pa, pb));
+    float seam = min(abs(fract(along / 7.0) - 0.5) * 2.0, abs(fract(ang / 0.3) - 0.5) * 2.0);
+    float groove = smoothstep(0.0, 0.09, seam);
+    float fine = smoothstep(0.0, 0.05, abs(fract(along / 1.75) - 0.5) * 2.0);
+    vec3 base = mix(vec3(0.16, 0.13, 0.11), vec3(0.50, 0.42, 0.35), id);
+    base *= (0.18 + 0.82 * groove) * (0.8 + 0.2 * fine);
+    base += (fbm2(vL.xy * 0.6) - 0.5) * 0.06;
+    vec3 s = normalize(uSunDir);
+    float ndl = max(dot(n, s), 0.0);
+    float shine = max(dot(n, normalize(uShineDir)), 0.0);
+    vec3 v = normalize(cameraPosition - vW);
+    float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
+    vec3 col = base * (0.12 + 1.2 * ndl) * vec3(1.0, 0.93, 0.82);
+    col += base * shine * vec3(0.95, 0.58, 0.26) * 1.6;
+    col += rim * base * vec3(0.9, 0.62, 0.32) * 0.5;
+    /* hublots : rares, sur les panneaux, battement lent */
+    float win = step(0.975, hash12(vec2(pa * 3.1 + 0.5, pb * 7.7 + 0.2))) * groove * step(0.4, fract(along / 7.0)) * step(fract(along / 7.0), 0.6);
+    col += vec3(0.98, 0.74, 0.32) * win * (1.2 + 0.6 * sin(uTime * 0.9 + id * 40.0));
+    gl_FragColor = vec4(col, 1.0);
+  }
+`;

@@ -12,7 +12,7 @@ async function shot(page, path) {
   await sharp(buf).webp({ quality: 82 }).toFile(path);
 }
 
-const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, "").split("=")));
+const args = Object.fromEntries(process.argv.slice(2).map((s) => { const i = s.indexOf("="); return [s.slice(2, i), s.slice(i + 1)]; }));
 const label = args.label ?? "captures";
 const url = args.url ?? "http://127.0.0.1:3100";
 const dir = `docs/captures/${label}`;

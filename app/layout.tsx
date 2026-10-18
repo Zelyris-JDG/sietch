@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 };
 
 /* Ciel réel et mouvement réduit posés AVANT le premier rendu (aucun flash) — hypothèse H9. */
-const bootScript = `(function(){try{var h=new Date().getHours(),s=(h>=7&&h<17)?"day":((h>=17&&h<20)||(h>=5&&h<7))?"dusk":"night";var d=document.documentElement;d.setAttribute("data-sky",s);if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)d.setAttribute("data-motion","reduce");}catch(e){}})();`;
+const bootScript = `(function(){try{var h=new Date().getHours(),s=(h>=7&&h<17)?"day":((h>=17&&h<20)||(h>=5&&h<7))?"dusk":"night";var q=new URLSearchParams(location.search).get("ciel");var m={jour:"day",crepuscule:"dusk",nuit:"night"};if(q&&m[q])s=m[q];var d=document.documentElement;d.setAttribute("data-sky",s);if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)d.setAttribute("data-motion","reduce");}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

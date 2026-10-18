@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { subscribe, type DescentState } from "../../src/lib/store";
 import { armSound, setSound, soundEnabled, subscribeSound } from "../../src/lib/sound";
 import { onPrescience, setPrescience } from "../../src/lib/prescience";
+import { formatAltitude } from "../../src/lib/format";
 
 const NAV: { id: string; label: string }[] = [
   { id: "orbite", label: "Orbite" },
@@ -14,14 +15,6 @@ const NAV: { id: string; label: string }[] = [
   { id: "sietch", label: "Sietch" },
   { id: "prescience", label: "Prescience" },
 ];
-
-export function formatAltitude(m: number): string {
-  if (m < 0) return `${Math.round(-m)} M SOUS LE ROC`;
-  if (m >= 100_000) return `${Math.round(m / 1000).toLocaleString("fr-FR")} KM`;
-  if (m >= 10_000) return `${(m / 1000).toFixed(1).replace(".", ",")} KM`;
-  if (m >= 1000) return `${(m / 1000).toFixed(2).replace(".", ",")} KM`;
-  return `${Math.round(m)} M`;
-}
 
 /** Console : compteur d'altitude, son, sortie de prescience, navigation par scènes. */
 export function Hud() {
