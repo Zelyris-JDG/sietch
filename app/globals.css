@@ -422,6 +422,7 @@ html.intro-open { overflow: hidden; }
 .sw--rock::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(242,181,68,.05) 0 1px, transparent 1px 48px); }
 .sw--night { background: linear-gradient(to bottom, #04050c, #0a0c1c 60%, #06070f); }
 html[data-section="orbite"] .sw--space { opacity: 1; }
+html[data-section="orbite"] .sw--planet { opacity: .5; } /* version calme : le limbe de la planète sous le héro, comme dans le monde rendu */
 html[data-section="entree"] .sw--space, html[data-section="entree"] .sw--planet { opacity: 1; }
 html[data-section="entree"] .sw--storm { opacity: .55; }
 html[data-section="desert"] .sw--dunes { opacity: 1; }
