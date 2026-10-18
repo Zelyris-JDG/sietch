@@ -306,6 +306,11 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   let running = true;
   let lost = false;
   const t0 = performance.now();
+  let last = t0;
+  /* Lissages indépendants de la cadence : k est le coefficient voulu à 60 images/s ; à 30 ou 120 images/s,
+     la caméra converge en autant de SECONDES (et non d'images). */
+  let dt = 1 / 60;
+  const sm = (k: number) => 1 - Math.pow(1 - k, dt * 60);
   let smoothWorm = 0;
   let prescienceBlend = 0;
   let frameNo = 0;
@@ -338,10 +343,12 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     if (underground && (frameNo & 1) === 1) return;
     const now = performance.now();
     const time = (now - t0) / 1000;
+    dt = Math.min(0.1, Math.max(0.001, (now - last) / 1000));
+    last = now;
     const o = p.orbite, e = p.entree, d = p.desert, s = p.epice;
     const dark = Math.max(p.maisons, p.sietch, p.prescience, p.fin);
-    smoothWorm += (state.worm - smoothWorm) * 0.06;
-    prescienceBlend += ((state.prescience ? 1 : 0) - prescienceBlend) * 0.05;
+    smoothWorm += (state.worm - smoothWorm) * sm(0.06);
+    prescienceBlend += ((state.prescience ? 1 : 0) - prescienceBlend) * sm(0.05);
 
     // Chapitre 1 — soute et orbite : la frégate descend sous le long-courrier, le vaisseau recule, la planète monte.
     const exitT = clamp01(o / 0.55);            // sortie de soute
@@ -412,14 +419,14 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     if (inDesert) {
       // Caméra au-dessus des dunes : elle descend de 70 à 6 unités, glisse vers l'avant, puis rase le sable pour l'épice.
       const zWant = -(desertT * 160 + s * 60);
-      pathX += (valleyX(zWant, pathX) - pathX) * 0.03;
+      pathX += (valleyX(zWant, pathX) - pathX) * sm(0.03);
       const ground = duneBase(pathX, zWant);
       const clearance = lerp(12, 7, desertT) - smoothstep(0, 1, s) * 1.5;
       const h = Math.max(lerp(40, 6, smoothstep(0, 0.85, desertT)) - smoothstep(0, 1, s) * 2.5, ground + clearance);
       wantPos.set(pathX, h, zWant);
       const ahead = lerp(170, 90, desertT);
       const zAhead = zWant - ahead;
-      aheadX += (valleyX(zAhead, pathX) - aheadX) * 0.03;
+      aheadX += (valleyX(zAhead, pathX) - aheadX) * sm(0.03);
       wantTarget.set(aheadX, Math.max(lerp(12, 5, desertT) - s * 2, duneBase(aheadX, zAhead) + 3), zAhead);
       sky.position.copy(camPos);
       // Le sol suit la caméra par pas entiers (le relief est fonction de la position monde : rien ne saute).
@@ -461,7 +468,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       renderer.setClearColor(c, 1);
     }
 
-    const k = inDesert ? 0.08 : 0.1;
+    const k = sm(inDesert ? 0.08 : 0.1);
     camPos.lerp(wantPos, k);
     camTarget.lerp(wantTarget, k);
     camera.position.copy(camPos);
