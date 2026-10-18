@@ -5,6 +5,7 @@
  */
 import * as THREE from "three";
 import { state, clamp01, lerp, smoothstep } from "../lib/store";
+import { duneBase } from "./dunes";
 import { DUNE_FRAG, DUNE_VERT, HALO_FRAG, HALO_VERT, HULL_FRAG, HULL_VERT, PARTICLE_FRAG, PARTICLE_VERT, PLANET_FRAG, PLANET_VERT, SKY_FRAG, SKY_VERT, WIND_VERT } from "./shaders";
 
 export type WorldOptions = { tier: "low" | "high" };
@@ -236,7 +237,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     vertexShader: PARTICLE_VERT, fragmentShader: PARTICLE_FRAG, transparent: true, depthWrite: false,
     uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uSpeed: { value: 55 }, uDir: { value: new THREE.Vector3(1, -0.15, 0.1).normalize() }, uSpan: { value: 180 }, uPixelRatio: { value: pixelRatio }, uColor: { value: new THREE.Color(0.86, 0.58, 0.30) } },
   }));
-  const storm = new THREE.Points(keep(particleGeometry(stormCount, new THREE.Vector3(180, 120, 160), rand, 1.2, 4.5)), stormMat);
+  const storm = new THREE.Points(keep(particleGeometry(stormCount, new THREE.Vector3(180, 120, 160), rand, 1.6, 6.0)), stormMat);
   storm.frustumCulled = false;
   scene.add(storm);
 
@@ -308,6 +309,18 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   let smoothWorm = 0;
   let prescienceBlend = 0;
   let frameNo = 0;
+  /* Le chemin de la descente suit le creux entre deux dunes : pour une position z, le x du relief le plus bas
+     dans une fenêtre de ±150 unités (formule des dunes portée sur le processeur). */
+  const valleyX = (z: number, around: number): number => {
+    let best = around, bh = Infinity;
+    for (let x = around - 150; x <= around + 150; x += 15) {
+      const hh = duneBase(x, z);
+      if (hh < bh) { bh = hh; best = x; }
+    }
+    return best;
+  };
+  let pathX = valleyX(0, 45);
+  let aheadX = valleyX(-170, pathX);
 
   const onLost = (e: Event) => { e.preventDefault(); lost = true; };
   const onRestored = () => { lost = false; };
@@ -340,7 +353,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     const desertT = d;
     const inDesert = d > 0.001 && s < 0.999;
 
-    space.visible = d < 0.22;
+    space.visible = d <= 0.001; // la tempête (opaque à l'entrée du désert) couvre le changement de caméra
     storm.visible = stormT > 0.001;
     desert.visible = inDesert;
     spice.visible = s > 0.02 || dark > 0;
@@ -391,28 +404,33 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
 
     if (storm.visible) {
       stormMat.uniforms.uTime.value = time;
-      stormMat.uniforms.uAlpha.value = stormT * 0.85;
+      stormMat.uniforms.uAlpha.value = stormT;
       storm.position.copy(camPos);
       storm.position.z -= 60;
     }
 
     if (inDesert) {
       // Caméra au-dessus des dunes : elle descend de 70 à 6 unités, glisse vers l'avant, puis rase le sable pour l'épice.
-      const h = lerp(46, 7, smoothstep(0, 0.85, desertT)) - smoothstep(0, 1, s) * 3.0;
-      const forward = desertT * 160 + s * 60;
-      wantPos.set(forward, h + 0.0, 0);
+      const zWant = -(desertT * 160 + s * 60);
+      pathX += (valleyX(zWant, pathX) - pathX) * 0.03;
+      const ground = duneBase(pathX, zWant);
+      const clearance = lerp(12, 7, desertT) - smoothstep(0, 1, s) * 1.5;
+      const h = Math.max(lerp(40, 6, smoothstep(0, 0.85, desertT)) - smoothstep(0, 1, s) * 2.5, ground + clearance);
+      wantPos.set(pathX, h, zWant);
       const ahead = lerp(170, 90, desertT);
-      wantTarget.set(forward + ahead, lerp(14, 6, desertT) - s * 2, -12);
+      const zAhead = zWant - ahead;
+      aheadX += (valleyX(zAhead, pathX) - aheadX) * 0.03;
+      wantTarget.set(aheadX, Math.max(lerp(12, 5, desertT) - s * 2, duneBase(aheadX, zAhead) + 3), zAhead);
       sky.position.copy(camPos);
       // Le sol suit la caméra par pas entiers (le relief est fonction de la position monde : rien ne saute).
       dunes.position.set(Math.round(camPos.x / 50) * 50, 0, Math.round(camPos.z / 50) * 50);
       duneUniforms.uTime.value = time;
       duneUniforms.uWorm.value = smoothWorm;
       // Le ver approche de l'avant quand on marche au rythme : sa bosse se rapproche de la caméra.
-      duneUniforms.uWormPos.value.set(camPos.x + 120 - smoothWorm * 95, -14 + Math.sin(time * 0.3) * 10);
+      duneUniforms.uWormPos.value.set(camPos.x + Math.sin(time * 0.3) * 10, camPos.z - 120 + smoothWorm * 95);
       duneUniforms.uFade.value = 1 - smoothstep(0.55, 1, s) * 0.85;
       windMat.uniforms.uAlpha.value = (0.5 + smoothWorm * 0.4) * (1 - smoothstep(0.6, 1, s));
-      windMat.uniforms.uOrigin.value.set(camPos.x - 60, 0, camPos.z - 40);
+      windMat.uniforms.uOrigin.value.set(camPos.x - 70, 0, camPos.z - 110);
       skyMat.uniforms.uTime.value = time;
       skyMat.uniforms.uDust.value = 0.35 + (1 - smoothstep(0, 0.4, d)) * 0.6 + smoothWorm * 0.25;
       fogColor.copy(desertFog).lerp(new THREE.Color(0x0b0908), smoothstep(0.55, 1, s) * 0.9);

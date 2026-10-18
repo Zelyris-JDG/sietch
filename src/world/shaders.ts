@@ -93,7 +93,9 @@ export const SKY_FRAG = /* glsl */ `
     /* nuit : deux lunes */
     vec3 m1 = normalize(vec3(0.42, 0.40, -0.80)); vec3 m2 = normalize(vec3(-0.28, 0.52, -0.80));
     float l1 = disc(d, m1, 0.055, 0.004); float l2 = disc(d, m2, 0.026, 0.003);
-    float sh1 = 0.55 + 0.45 * clamp(dot(normalize(d - m1 * dot(d, m1)), vec3(1.0, 0.4, 0.0)), 0.0, 1.0);
+    /* assombrissement du limbe : plus doux vers le bord */
+    float a1 = acos(clamp(dot(d, m1), -1.0, 1.0)) / 0.055;
+    float sh1 = 1.0 - 0.38 * smoothstep(0.55, 1.0, a1) - 0.25 * smoothstep(0.0, 1.0, (d.x - m1.x) * 6.0);
     col += (vec3(0.93, 0.89, 0.80) * l1 * sh1 + vec3(0.80, 0.76, 0.70) * l2 + vec3(0.6, 0.65, 0.9) * 0.08 * pow(max(dot(d, m1), 0.0), 40.0)) * uW.z;
     /* étoiles fines la nuit et au crépuscule */
     float st = step(0.9975, hash12(floor(d.xz * 900.0 + d.y * 300.0))) * smoothstep(0.0, 0.25, h);
