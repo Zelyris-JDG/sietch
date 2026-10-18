@@ -649,3 +649,9 @@ button.ticker:hover { background: rgba(242, 181, 68, 0.11); }
 /* ---- Carte d'Arrakis : vignette d'une fiche ------------------------------------------------------------------- */
 .map__photo { position: relative; margin: 0; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(242, 181, 68, 0.2); background: #080605; }
 .map__photo img { object-fit: cover; }
+
+/* ---- Carte d'Arrakis plus vivante (C2) : le sable des dunes du sud dérive lentement, le vent du bassin du nord souffle ---- */
+.map__dune { animation: map-drift 26s linear infinite; }
+.map__wind { animation: map-drift 9s linear infinite; }
+@keyframes map-drift { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -24; } }
+

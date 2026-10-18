@@ -38,15 +38,15 @@ export function ArrakisMap({ images }: { images?: MediaPaths }) {
           {/* calottes */}
           <ellipse cx="300" cy="22" rx="150" ry="34" fill="rgba(234,216,182,.22)" />
           <ellipse cx="300" cy="382" rx="120" ry="30" fill="rgba(234,216,182,.16)" />
-          {/* dunes du sud : hachures */}
+          {/* dunes du sud : hachures ; le sable dérive lentement vers l'est (animation CSS, coupée en mouvement réduit) */}
           {Array.from({ length: 9 }, (_, i) => (
-            <path key={i} d={`M${40 + i * 10} ${250 + i * 14} q 60 -18 120 0 t 120 0 t 120 0 t 120 0`} fill="none" stroke="rgba(242,181,68,.14)" />
+            <path key={i} className="map__dune" style={{ animationDelay: `${-i * 1.7}s` }} d={`M${40 + i * 10} ${250 + i * 14} q 60 -18 120 0 t 120 0 t 120 0 t 120 0`} fill="none" stroke="rgba(242,181,68,.14)" strokeDasharray="14 10" />
           ))}
           {/* Mur du Bouclier */}
           <path d="M120 170 q 60 -30 120 -8 t 120 10 t 120 -6 q 20 4 40 18" fill="none" stroke="rgba(234,216,182,.65)" strokeWidth="3" strokeLinecap="round" />
           <path d="M120 170 q 60 -30 120 -8 t 120 10 t 120 -6 q 20 4 40 18" fill="none" stroke="rgba(11,9,8,.9)" strokeWidth="1" strokeDasharray="3 5" />
           {/* bassin du nord */}
-          <path d="M200 120 q 100 -40 220 -10" fill="none" stroke="rgba(242,181,68,.25)" strokeDasharray="2 6" />
+          <path className="map__wind" d="M200 120 q 100 -40 220 -10" fill="none" stroke="rgba(242,181,68,.25)" strokeDasharray="2 6" />
           {PLACES.map((p) => (
             <g key={p.id} className="map__spot" role="button" tabIndex={0} aria-pressed={sel === p.id} aria-label={`${p.name} — ${p.kind}`}
               transform={`translate(${p.x} ${p.y})`}
