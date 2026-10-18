@@ -1,6 +1,6 @@
 # Médias — images à générer par Johan (ChatGPT)
 
-Règles : **paysages et matières uniquement** ; aucun personnage, aucun véhicule ou design des films / de la série / du jeu, aucun logo, aucun texte dans l'image. Format : 2560 × 1440 (16:9) sauf mention ; exporter en PNG, le projet les convertit en AVIF/WebP (`scripts/images.mjs`, à venir). Dépôt : `public/images/<nom>.png`.
+Règles : **paysages et matières uniquement** ; aucun personnage, aucun véhicule ou design des films / de la série / du jeu, aucun logo, aucun texte dans l'image. Format : 2560 × 1440 (16:9) sauf mention ; exporter en PNG et déposer dans `public/images/<nom>.png`. La conversion en AVIF/WebP et le branchement dans les scènes se font au chantier suivant (C2), une fois les fichiers là.
 
 | # | Nom de fichier | Prompt (à coller tel quel) | Emplacement prévu |
 |---|---|---|---|
@@ -17,4 +17,4 @@ Règles : **paysages et matières uniquement** ; aucun personnage, aucun véhicu
 | 11 | `rock-outcrop.png` | Affleurement rocheux isolé dans un désert immense, midi écrasant, ombres très courtes, ciel blanc de chaleur, sans texte. | Fiche « Désert profond » de la carte ; variante « jour écrasant » du ciel réel. |
 | 12 | `dusk-sand.png` (vertical 1440 × 2560) | Dunes à la tombée du jour, dégradé du ciel de l'orange à l'indigo, un filet de sable qui coule d'une crête, cadrage vertical, sans texte. | Repli image sur téléphone (scènes 2 à 4). |
 
-Emplacements dans le code : `src/config/media.ts` déclare chaque image (chemin, alt, section). Tant qu'un fichier manque, la scène garde son rendu procédural.
+Branchement prévu (C2) : un fichier `src/config/media.ts` déclarera chaque image (chemin, alt, section) et les replis image des scènes la liront ; tant qu'un fichier manque, la scène garde son rendu procédural. En V1, rien ne lit encore ces images : les déposer suffit.

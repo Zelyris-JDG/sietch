@@ -103,6 +103,7 @@ g) Ciel réel : selon l'heure locale, jour écrasant, crépuscule, nuit aux deux
 - Johan : créer le projet Vercel lié au dépôt (H7) et dire « mets en ligne » après validation.
 - Johan : fournir une clé Pexels (gratuite) si l'on veut des vidéos réelles (H2).
 - Johan : générer les images de `docs/medias.md` et les déposer dans `public/images/`.
+- C2 : brancher ces images (déclaration `src/config/media.ts`, conversion AVIF/WebP, replis image des scènes et de la carte) — en V1 rien ne les lit encore.
 - Johan : vérifier sur son téléphone (Android) : fluidité de la descente, le son (nappe, vent, grondement), « marcher sans rythme » au doigt, la lisibilité du héro sur le vaisseau, les infobulles au toucher, le menu des onglets de la console.
 - Johan : cliquer une fois chaque lien officiel de la console (H5) et relire les mentions légales en ligne (H4).
 - C2 (suggestions) : éclairage et détails du long-courrier (ombres portées, feux animés), raccord plus doux tempête → dunes, pied de page WebGL (lunes dans le monde), version anglaise, mesure LCP réelle sur préversion, image de partage mise à jour.
