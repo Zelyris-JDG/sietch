@@ -174,7 +174,7 @@ main { position: relative; z-index: 1; }
 
 /* Voiles de lisibilité (jamais de flou) */
 .scene__veil { display: none; }
-.descent-veil { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to right, rgba(11, 9, 8, 0.30) 0%, rgba(11, 9, 8, 0.20) 40%, rgba(11, 9, 8, 0) 68%), linear-gradient(to top, rgba(11, 9, 8, 0.66) 0%, rgba(11, 9, 8, 0.30) 38%, rgba(11, 9, 8, 0.06) 64%, rgba(11, 9, 8, 0.18) 100%); }
+.descent-veil { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to right, rgba(11, 9, 8, 0.36) 0%, rgba(11, 9, 8, 0.24) 40%, rgba(11, 9, 8, 0) 68%), linear-gradient(to top, rgba(11, 9, 8, 0.66) 0%, rgba(11, 9, 8, 0.32) 38%, rgba(11, 9, 8, 0.08) 64%, rgba(11, 9, 8, 0.18) 100%); } /* C2 : colonne gauche un peu plus voilée (indice et signature du désert en plein jour mesurés à 3,3 et 4,3 sans le halo) */
 /* Halo serré + halo large : le texte clair reste lisible sur le sable du plein jour (mesure : scripts/diag-contraste.mjs). */
 .scene__sticky, .hero { text-shadow: 0 0 2px rgba(0, 0, 0, 0.8), 0 1px 3px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 0, 0, 0.5); }
 .scene__sticky .scene__index, .hero .scene__index, .scene__sticky .epigraph cite, .hero .epigraph cite { color: var(--text); }
@@ -400,7 +400,7 @@ html[data-motion="reduce"] .scene__sticky { position: relative; }
   .hud__label, .hud__phase { display: none; }
   .hud__value { font-size: 0.88rem; }
   .toast { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 60px); } /* au-dessus de la plaque d'altitude */
-  .descent-veil { background: linear-gradient(to top, rgba(11, 9, 8, 0.8) 0%, rgba(11, 9, 8, 0.56) 35%, rgba(11, 9, 8, 0.42) 65%, rgba(11, 9, 8, 0.44) 100%); }
+  .descent-veil { background: linear-gradient(to top, rgba(11, 9, 8, 0.8) 0%, rgba(11, 9, 8, 0.58) 35%, rgba(11, 9, 8, 0.48) 65%, rgba(11, 9, 8, 0.48) 100%); } /* C2 : +6 points au tiers haut (épigraphe du désert à 4,18 en plein jour sans le halo) */
   .epigraph { font-size: 1.45rem; }
   .monument { letter-spacing: 0.22em; }
   .hero__hint { margin-top: 2rem; }
