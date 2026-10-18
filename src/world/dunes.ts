@@ -35,10 +35,10 @@ export function duneBase(px: number, py: number): number {
   const qx = px * 0.011, qy = py * 0.011;
   const bend = 0.55 * Math.sin(qy * 1.9 + 0.7) + (fbm2(qx * 0.6, qy * 0.6) - 0.5) * 1.6;
   let ridge = 1 - Math.abs(Math.sin(qx * 3.14159 + bend));
-  ridge = Math.pow(ridge, 2.2);
+  ridge = Math.pow(ridge, 1.6);
   let h = ridge * 34;
   const q2x = (px * 0.6 + py * 0.8) * 0.02, q2y = (py * 0.6 - px * 0.8) * 0.02;
-  const ridge2 = Math.pow(1 - Math.abs(Math.sin(q2x * 3.14159 + (fbm2(q2x, q2y) - 0.5) * 2)), 2.6);
+  const ridge2 = Math.pow(1 - Math.abs(Math.sin(q2x * 3.14159 + (fbm2(q2x, q2y) - 0.5) * 2)), 2.0);
   h += ridge2 * 9;
   h += (fbm2(px * 0.02 + 3, py * 0.02 + 3) - 0.5) * 10;
   h += (fbm2(px * 0.09, py * 0.09) - 0.5) * 1.8;
