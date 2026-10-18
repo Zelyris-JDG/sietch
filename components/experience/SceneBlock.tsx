@@ -18,7 +18,7 @@ export function SceneBlock({ scene, tall = "tall", backdrop, children }: { scene
           <h2 id={`${scene.id}-title`} className="monument monument--small">{scene.title}</h2>
           <div className="prose">
             {scene.paragraphs.map((p, i) => <p key={i}><RichText text={p} /></p>)}
-            {scene.aside && <p className="mono" style={{ color: "var(--muted)", marginTop: "1.2em" }}>{scene.aside}</p>}
+            {scene.aside && <p className="mono" style={{ color: "var(--sand)", marginTop: "1.2em" }}>{scene.aside}</p>}
           </div>
         </div>
         {children}
