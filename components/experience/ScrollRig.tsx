@@ -67,20 +67,30 @@ export function ScrollRig() {
     document.addEventListener("focusin", onFocusIn);
 
     // Rythme du pas : on écoute les gestes (molette, doigt, clavier), pas le défilement lissé.
+    // Un « pas » = un cran de molette, une touche, ou UN geste du doigt entier (du toucher au relâcher) : la cadence
+    // du doigt est celle des balayages successifs, pas celle des événements touchmove à l'intérieur d'un balayage.
     const steps: { t: number; d: number }[] = [];
-    const push = (d: number) => {
-      const t = performance.now();
+    const pushAt = (t: number, d: number) => {
       steps.push({ t, d: Math.abs(d) });
       if (steps.length > 90) steps.shift();
     };
+    const push = (d: number) => pushAt(performance.now(), d);
     const onWheel = (e: WheelEvent) => push(e.deltaY || e.deltaX);
-    let lastTouchY = 0;
-    const onTouchStart = (e: TouchEvent) => { lastTouchY = e.touches[0]?.clientY ?? 0; };
-    const onTouchMove = (e: TouchEvent) => { const y = e.touches[0]?.clientY ?? 0; push(y - lastTouchY); lastTouchY = y; };
+    let touchStartY = 0, touchLastY = 0, touchStartT = 0, touchActive = false;
+    const onTouchStart = (e: TouchEvent) => { touchStartY = touchLastY = e.touches[0]?.clientY ?? 0; touchStartT = performance.now(); touchActive = true; };
+    const onTouchMove = (e: TouchEvent) => { touchLastY = e.touches[0]?.clientY ?? touchLastY; };
+    const onTouchEnd = () => {
+      if (!touchActive) return;
+      touchActive = false;
+      const d = touchLastY - touchStartY;
+      if (Math.abs(d) > 8) pushAt(touchStartT, d);
+    };
     const onKey = (e: KeyboardEvent) => { if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "].includes(e.key)) push(120); };
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
     window.addEventListener("keydown", onKey);
 
     let discovered = readPref(storageKeys.wormDiscovered) === "1";
@@ -124,8 +134,9 @@ export function ScrollRig() {
         html.dataset.descent = on ? "on" : "off";
       }
 
-      // Régularité du pas sur les 2,8 dernières secondes (molette, doigt ou clavier, même lents).
-      while (steps.length && now - steps[0].t > 2800) steps.shift();
+      // Régularité du pas sur les 4,5 dernières secondes (molette, doigt ou clavier, même lents : cinq balayages
+      // du doigt espacés de 0,9 s suffisent).
+      while (steps.length && now - steps[0].t > 4500) steps.shift();
       let rhythm = 0;
       if (steps.length >= 5) {
         const intervals: number[] = [];
@@ -186,6 +197,8 @@ export function ScrollRig() {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
       window.removeEventListener("keydown", onKey);
       delete html.dataset.section;
       delete html.dataset.descent;

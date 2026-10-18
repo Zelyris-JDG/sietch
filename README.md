@@ -18,7 +18,7 @@ Paramètres d'adresse utiles pour tester : `?ciel=jour|crepuscule|nuit` (ciel r�
 
 ```bash
 pnpm typecheck && pnpm lint && pnpm test && pnpm build
-BASE_URL=http://127.0.0.1:3100 pnpm test:e2e      # Playwright (serveur de production lancé à part)
+BASE_URL=http://127.0.0.1:3100 pnpm test:e2e      # Playwright, bureau + téléphone (serveur de production lancé à part) ; ver à la molette (bureau) et au doigt (téléphone)
 node scripts/captures.mjs --label=<nom> --wait=4000   # captures bureau + mobile dans docs/captures/<nom>/ (--only=desert,epice --view=bureau)
 node scripts/diag-contraste.mjs --url="http://127.0.0.1:3100/?ciel=jour"   # contraste des textes sur le monde rendu (sans le halo)
 node scripts/diag-ver-tremble.mjs <sortie.png>      # le monde reste en place pendant le tremblement du ver
