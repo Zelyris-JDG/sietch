@@ -1,6 +1,6 @@
 # Médias — images à générer par Johan (ChatGPT)
 
-Règles : **paysages et matières uniquement** ; aucun personnage, aucun véhicule ou design des films / de la série / du jeu, aucun logo, aucun texte dans l'image. Format : 2560 × 1440 (16:9) sauf mention ; exporter en PNG et déposer dans `public/images/<nom>.png`. La conversion en AVIF/WebP et le branchement dans les scènes se font au chantier suivant (C2), une fois les fichiers là.
+Règles : **paysages et matières uniquement** ; aucun personnage, aucun véhicule ou design des films / de la série / du jeu, aucun logo, aucun texte dans l'image. Format : 2560 × 1440 (16:9) sauf mention ; exporter en PNG et déposer dans `public/images/<nom>.png`. Depuis le chantier C2, chaque emplacement est branché : une image déposée s'affiche automatiquement, servie en AVIF/WebP par `next/image` ; tant qu'elle manque, la scène garde son rendu procédural (voir « Marche à suivre » plus bas).
 
 | # | Nom de fichier | Prompt (à coller tel quel) | Emplacement prévu |
 |---|---|---|---|
@@ -17,4 +17,18 @@ Règles : **paysages et matières uniquement** ; aucun personnage, aucun véhicu
 | 11 | `rock-outcrop.png` | Affleurement rocheux isolé dans un désert immense, midi écrasant, ombres très courtes, ciel blanc de chaleur, sans texte. | Fiche « Désert profond » de la carte ; variante « jour écrasant » du ciel réel. |
 | 12 | `dusk-sand.png` (vertical 1440 × 2560) | Dunes à la tombée du jour, dégradé du ciel de l'orange à l'indigo, un filet de sable qui coule d'une crête, cadrage vertical, sans texte. | Repli image sur téléphone (scènes 2 à 4). |
 
-Branchement prévu (C2) : un fichier `src/config/media.ts` déclarera chaque image (chemin, alt, section) et les replis image des scènes la liront ; tant qu'un fichier manque, la scène garde son rendu procédural. En V1, rien ne lit encore ces images : les déposer suffit.
+## Marche à suivre (une commande)
+
+1. Déposer chaque fichier dans `public/images/` sous le nom prévu dans le tableau (`.png` de préférence ; `.jpg`, `.webp` ou `.avif` acceptés).
+2. Lancer `pnpm medias` : la commande liste les 12 emplacements (présent / manquant), vérifie les dimensions (ratio, taille minimale) et écrit à côté de chaque image un `.webp` et un `.avif` de même nom.
+3. Commit + push (les images et leurs versions légères) : la préversion Vercel les affiche automatiquement, rien d'autre à brancher.
+
+## Comment c'est branché (C2)
+
+- `src/config/media.ts` déclare les 12 emplacements (identifiant = nom de fichier sans extension, alt en français, dimensions, usage) ; fichier pur, sans accès disque, importable côté client. Le test `tests/unit/media.test.mjs` vérifie qu'il reste conforme au tableau ci-dessus.
+- `src/lib/media.server.ts` (`presentMedia()`) lit `public/images/` au rendu serveur — donc au build (et à chaque déploiement Vercel) — et renvoie les chemins des fichiers présents. Extensions acceptées, par ordre de préférence : `.png`, `.jpg`, `.jpeg`, `.webp`, `.avif` (la source la plus riche d'abord : `next/image` produit lui-même l'AVIF/WebP servi). Les pages restent pré-rendues statiquement. Le paquet `server-only` n'est pas installé : le suffixe `.server.ts` tient lieu de garde, à n'importer que depuis `app/page.tsx`.
+- Version calme (`components/world/StillWorld.tsx`, prop `images`) : une image par couche, fondue par l'opacité existante de la couche — 1 espace (préchargée, seule image sur le chemin critique, et seulement si elle existe), 2 limbe de la planète (masquée en disque), 3 tempête, 4 dunes, 5 épice, 6 roche (Maisons, Sietch), 9 nuit (prescience, pied de page). Sur un écran en hauteur (téléphone), la 12 remplace la 3 et la 4 (`<picture>`, `(orientation: portrait)`). Les images des scènes suivantes ne sont montées qu'une scène à l'avance : rien ne pèse sur le premier écran.
+- Carte d'Arrakis (`components/sietch/ArrakisMap.tsx`, prop `images`) : vignette dans la fiche « Mur du Bouclier » (7), « Pôle Nord » / « Pôle Sud » (8) et « Désert profond » (11), avec un alt descriptif.
+- Fonds de section (`components/ui/MediaBackdrop.tsx`) : entrée de « Le Sietch » (10) et fond discret de « L'épice » (5), sous le voile et sous le texte ; alt vide (décoratif) ; aucune animation.
+- Non branchés en C2, déclarés quand même : la texture 2 dans le nuanceur WebGL de la planète et la variante « jour écrasant » de la 11 (monde three.js), l'arrière-plan du pied de page avec la 4, l'image de partage avec la 1.
+- Sans fichier : balisage et rendu strictement identiques à la V1 (captures `docs/captures/c2-medias/`).

@@ -1,0 +1,34 @@
+/* Images déposées par Johan (docs/medias.md), superposées dans les couches du monde calme, en fond de section et dans
+   les fiches de la carte. Aucune animation ici : les fondus viennent de l'opacité des couches (app/globals.css), déjà
+   coupés en mouvement réduit. Sans fichier, aucune de ces règles ne s'applique : le rendu procédural est intact. */
+
+/* ---- Monde calme : une image par couche, cadrée plein écran ------------------------------------------------- */
+.sw__img { object-fit: cover; }
+/* Texture de la planète (emplacement 2) : masquée en disque, aux mêmes proportions que le limbe en dégradé qu'elle habille. */
+.sw--planet .sw__img {
+  -webkit-mask-image: radial-gradient(90% 60% at 50% 125%, #000 0%, #000 44%, transparent 58%);
+  mask-image: radial-gradient(90% 60% at 50% 125%, #000 0%, #000 44%, transparent 58%);
+}
+/* Repli téléphone (emplacement 12) sans image horizontale : rien à l'horizontale, l'image verticale en hauteur. */
+@media (orientation: landscape) { .sw__img--portrait { display: none; } }
+
+/* ---- Fond de section (MediaBackdrop) : sous le voile (.scene__veil, z-index -1) et sous le contenu ------------- */
+.backdrop { position: absolute; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+.backdrop__img { object-fit: cover; }
+/* Toute la section, bords fondus pour ne créer aucune couture avec le monde derrière. */
+.backdrop--fill {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+}
+/* L'entrée de la section seulement : un écran de haut, fondu vers le bas. */
+.backdrop--top {
+  bottom: auto;
+  height: min(100vh, 100%);
+  height: min(100svh, 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+}
+
+/* ---- Carte d'Arrakis : vignette d'une fiche ------------------------------------------------------------------- */
+.map__photo { position: relative; margin: 0; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(242, 181, 68, 0.2); background: #080605; }
+.map__photo img { object-fit: cover; }
