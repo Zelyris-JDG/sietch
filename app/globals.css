@@ -323,11 +323,13 @@ html[data-prescience="on"] #world { filter: saturate(0.4) hue-rotate(190deg) bri
 .prescience__toggle { display: inline-flex; gap: 14px; flex-wrap: wrap; margin-top: 1.5rem; }
 
 /* ---- Message du ver ------------------------------------------------------------- */
-.toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translate(-50%, 20px); z-index: 40; max-width: min(38rem, 90vw); padding: 16px 20px; background: rgba(11, 9, 8, 0.92); border: 1px solid var(--line-strong); font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; line-height: 1.35; opacity: 0; visibility: hidden; transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out), visibility 0s linear 500ms; }
+.toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translate(-50%, 20px); z-index: 40; max-width: min(38rem, 90vw); padding: 16px 48px 16px 20px; background: rgba(11, 9, 8, 0.92); border: 1px solid var(--line-strong); font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; line-height: 1.35; opacity: 0; visibility: hidden; transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out), visibility 0s linear 500ms; }
 .toast[data-open="true"] { opacity: 1; transform: translate(-50%, 0); visibility: visible; transition-delay: 0s; }
 .toast small { display: block; margin-top: 8px; font-family: var(--font-mono); font-style: normal; font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); }
 .toast button { position: absolute; top: 6px; right: 8px; width: 36px; height: 36px; font-family: var(--font-mono); color: var(--muted); }
-html[data-worm="near"] body { animation: tremble 160ms linear infinite; }
+/* Le tremblement porte sur le monde (calques fixes), jamais sur body : un transform sur body ferait de lui le bloc
+   conteneur de tout élément fixe (canvas, voile, console), qui sauterait hors de l'écran. */
+html[data-worm="near"] #world, html[data-worm="near"] .still-world { animation: tremble 160ms linear infinite; }
 @keyframes tremble { 0% { transform: translate(0, 0); } 25% { transform: translate(0.6px, -0.4px); } 50% { transform: translate(-0.5px, 0.5px); } 75% { transform: translate(0.4px, 0.6px); } 100% { transform: translate(0, 0); } }
 
 /* ---- Pied de page : nuit aux deux lunes ------------------------------------------- */
@@ -368,7 +370,7 @@ html[data-worm="near"] body { animation: tremble 160ms linear infinite; }
 /* ---- Mouvement réduit : version calme, statique, complète --------------------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-  html[data-worm="near"] body { animation: none !important; }
+  html[data-worm="near"] #world, html[data-worm="near"] .still-world { animation: none !important; }
   .scene--tall, .scene--mid { min-height: 100svh; }
   .scene__sticky { position: relative; }
   .hud--alt { opacity: 1; transform: none; }
