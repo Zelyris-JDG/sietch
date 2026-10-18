@@ -37,14 +37,13 @@ html[data-prescience="on"] {
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: auto; }
-html, body { margin: 0; padding: 0; background: var(--basalt); color: var(--text); }
+html, body { margin: 0; padding: 0; background: var(--basalt); color: var(--text); overflow-x: clip; }
 body {
   font-family: var(--font-caps);
   font-weight: 400;
   font-size: 1.0625rem;
   line-height: 1.6;
   min-height: 100svh;
-  overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -119,7 +118,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   position: absolute;
   left: 50%;
   bottom: calc(100% + 10px);
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--tip-shift, 0px)));
   width: min(22rem, 86vw);
   padding: 12px 14px;
   background: var(--basalt-2);
@@ -139,7 +138,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   visibility: hidden;
   transition: opacity 180ms var(--ease-out), visibility 0s linear 180ms;
 }
-.term__tip::before { content: ""; position: absolute; top: 100%; left: 50%; width: 10px; height: 10px; margin-left: -5px; margin-top: -5px; background: var(--basalt-2); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); transform: rotate(45deg); }
+.term__tip::before { content: ""; position: absolute; top: 100%; left: calc(50% - var(--tip-shift, 0px)); width: 10px; height: 10px; margin-left: -5px; margin-top: -5px; background: var(--basalt-2); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); transform: rotate(45deg); }
 .term__tip b { display: block; font-family: var(--font-mono); font-weight: 500; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); margin-bottom: 6px; }
 .term:hover > .term__tip, .term:focus-visible > .term__tip, .term[aria-expanded="true"] > .term__tip { opacity: 1; visibility: visible; transition-delay: 0s; }
 .term--below > .term__tip { bottom: auto; top: calc(100% + 10px); }
@@ -172,13 +171,17 @@ main { position: relative; z-index: 1; }
 @keyframes hint-drop { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 
 /* Voiles de lisibilité (jamais de flou) */
-.scene__veil { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(11, 9, 8, 0.82) 0%, rgba(11, 9, 8, 0.35) 40%, rgba(11, 9, 8, 0) 70%); }
-.scene--flat .scene__veil { background: rgba(11, 9, 8, 0.78); }
+.scene__veil { display: none; }
+.descent-veil { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(to top, rgba(11, 9, 8, 0.66) 0%, rgba(11, 9, 8, 0.30) 38%, rgba(11, 9, 8, 0.04) 64%, rgba(11, 9, 8, 0.16) 100%); }
+.scene__sticky, .hero { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 0 0 22px rgba(0, 0, 0, 0.45); }
+.scene--flat { text-shadow: none; }
+.scene--flat .scene__veil { display: block; position: absolute; inset: 0; pointer-events: none; background: rgba(11, 9, 8, 0.80); }
+.scene { z-index: 1; }
 
 /* ---- Console (HUD) ------------------------------------------------------------ */
 .hud { position: fixed; z-index: 20; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; color: var(--amber); pointer-events: none; }
 .hud a, .hud button { pointer-events: auto; }
-.hud--alt { left: var(--gutter); top: max(18px, env(safe-area-inset-top)); display: grid; gap: 4px; opacity: 0; transform: translateY(-6px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+.hud--alt { left: calc(var(--gutter) - 12px); top: max(10px, env(safe-area-inset-top)); display: grid; gap: 4px; padding: 10px 12px; background: rgba(11, 9, 8, 0.72); border: 1px solid rgba(242, 181, 68, 0.12); opacity: 0; transform: translateY(-6px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
 html[data-descent="on"] .hud--alt { opacity: 1; transform: none; }
 .hud__label { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.22em; }
 .hud__value { font-size: clamp(1rem, 1.6vw, 1.35rem); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }

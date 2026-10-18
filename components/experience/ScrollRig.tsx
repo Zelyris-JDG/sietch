@@ -23,6 +23,7 @@ export function ScrollRig() {
     html.dataset.motion = reduce ? "reduce" : "full";
     gsap.registerPlugin(ScrollTrigger);
 
+    (window as unknown as { __sietch?: typeof state }).__sietch = state; // lecture seule, pour les tests et le mode mesure
     const sections = SCENES.map((id) => [id, document.getElementById(id)] as const).filter(([, el]) => el) as [SceneId, HTMLElement][];
 
     let lenis: Lenis | null = null;
@@ -114,10 +115,10 @@ export function ScrollRig() {
         html.dataset.descent = on ? "on" : "off";
       }
 
-      // Régularité du pas sur les 1,6 dernières secondes.
-      while (steps.length && now - steps[0].t > 1600) steps.shift();
+      // Régularité du pas sur les 2,8 dernières secondes (molette, doigt ou clavier, même lents).
+      while (steps.length && now - steps[0].t > 2800) steps.shift();
       let rhythm = 0;
-      if (steps.length >= 6) {
+      if (steps.length >= 5) {
         const intervals: number[] = [];
         const deltas: number[] = [];
         for (let i = 1; i < steps.length; i++) {
@@ -135,7 +136,7 @@ export function ScrollRig() {
       state.rhythm += (rhythm - state.rhythm) * Math.min(1, dt * 4);
 
       const onSand = !reduce && SAND_SCENES.some((id) => state.progress[id] > 0.12 && state.progress[id] < 0.92);
-      if (onSand && steps.length >= 6) {
+      if (onSand && steps.length >= 5) {
         state.worm += dt * (state.rhythm > 0.55 ? 0.16 + state.rhythm * 0.22 : -0.45);
       } else {
         state.worm -= dt * (onSand ? 0.08 : 0.5);

@@ -25,6 +25,7 @@ export default function Home() {
       <ScrollRig />
       <Hud />
       <main id="main" tabIndex={-1}>
+        <div className="descent-veil" aria-hidden="true" />
         <section id="orbite" className="scene scene--tall" data-scene aria-labelledby="orbite-title">
           <div className="scene__veil" aria-hidden="true" />
           <div className="scene__sticky hero">
