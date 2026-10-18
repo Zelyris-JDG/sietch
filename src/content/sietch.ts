@@ -97,7 +97,7 @@ export const FILMS: Film[] = [
     text: "Dix mille ans avant les films : deux sœurs Harkonnen fondent ce qui deviendra le Bene Gesserit. Inspirée du roman Sisterhood of Dune de Brian Herbert et Kevin J. Anderson.",
     links: [
       { label: "Dossier officiel Warner Bros. Discovery", href: "https://press.wbd.com/na/property/dune-prophecy" },
-      { label: "HBO", href: "https://www.hbo.com" },
+      { label: "HBO — page de la série", href: "https://www.hbo.com/dune-prophecy" },
     ],
   },
 ];
@@ -147,11 +147,11 @@ export const GAME = {
     { name: "PC (Steam)", date: "10 juin 2025" },
     { name: "PlayStation 5", date: "22 septembre 2026" },
     { name: "Xbox Series X|S", date: "22 septembre 2026 · dans le Xbox Game Pass le même jour" },
-    { name: "Japon (PS5, Xbox)", date: "29 octobre 2026" },
+    { name: "Japon (PS5, physique et numérique)", date: "29 octobre 2026" },
   ],
   facts: [
     "Mise à jour 1.5 (17 septembre 2026) : mode solo complet, options de personnalisation de la partie, fin de l'histoire du Livre Un.",
-    "Consoles : accès anticipé le 17 septembre 2026 pour les éditions Deluxe et Ultimate ; jeu croisé PC / consoles annoncé « peu après » la sortie.",
+    "Consoles : accès anticipé le 17 septembre 2026 pour les éditions Deluxe et Ultimate ; jeu croisé PC / consoles annoncé pour après le lancement, toujours sans date au 18 octobre 2026 (seule passerelle : Xbox ↔ PC Microsoft Store).",
     "Éditions console annoncées par Funcom : Standard 49,99 $, Deluxe 69,99 $, Ultimate 89,99 $.",
   ],
   links: [
@@ -160,6 +160,8 @@ export const GAME = {
     { label: "Discord officiel", href: "https://discord.com/servers/dune-awakening-1006265467754790943" },
     { label: "Actualités officielles", href: "https://duneawakening.com/news/" },
     { label: "Centre d'aide Funcom", href: "https://funcom.helpshift.com/hc/en/4-dune-awakening/" },
+    { label: "X · @DuneAwakening", href: "https://x.com/DuneAwakening" },
+    { label: "YouTube · Funcom", href: "https://www.youtube.com/funcom" },
     { label: "Funcom", href: "https://www.funcom.com" },
   ] as Link[],
   news: [
@@ -197,7 +199,7 @@ export const NETWORKS: NetworkGroup[] = [
     title: "Série",
     links: [
       { label: "Dune: Prophecy — dossier officiel WBD", href: "https://press.wbd.com/na/property/dune-prophecy" },
-      { label: "HBO", href: "https://www.hbo.com" },
+      { label: "HBO — page de la série", href: "https://www.hbo.com/dune-prophecy" },
     ],
   },
   {
@@ -207,6 +209,8 @@ export const NETWORKS: NetworkGroup[] = [
       { label: "duneawakening.com", href: "https://duneawakening.com" },
       { label: "Steam", href: "https://store.steampowered.com/app/1172710/" },
       { label: "Discord officiel", href: "https://discord.com/servers/dune-awakening-1006265467754790943" },
+      { label: "X · @DuneAwakening", href: "https://x.com/DuneAwakening", note: "Cité par le kit presse Funcom" },
+      { label: "YouTube · Funcom", href: "https://www.youtube.com/funcom", note: "Bandes-annonces et directs du studio" },
       { label: "Funcom", href: "https://www.funcom.com" },
     ],
   },
@@ -263,8 +267,9 @@ export type Release = {
 
 export const RELEASES: Release[] = [
   { id: "dune-3", kind: "Film", title: "Dune : Troisième Partie", date: "2026-12-16", where: "Sortie en France", note: "États-Unis : 18 décembre 2026. Warner Bros. · Legendary.", links: [{ label: "X · @dunemovie", href: "https://x.com/dunemovie" }] },
-  { id: "awakening-japon", kind: "Jeu", title: "Dune: Awakening au Japon", date: "2026-10-29", where: "PS5 et Xbox Series X|S, physique et numérique", links: [{ label: "Site officiel", href: "https://duneawakening.com" }] },
-  { id: "prophecy-s2", kind: "Série", title: "Dune: Prophecy — saison 2", date: null, where: "HBO", note: "Tournage lancé le 11 novembre 2025 (communiqué Warner Bros. Discovery), huit épisodes. La presse estime une fenêtre fin 2026 – début 2027.", links: [{ label: "Dossier officiel WBD", href: "https://press.wbd.com/na/property/dune-prophecy" }] },
+  { id: "awakening-japon", kind: "Jeu", title: "Dune: Awakening au Japon", date: "2026-10-29", where: "PS5, éditions physique et numérique (Spike Chunsoft)", links: [{ label: "Site officiel", href: "https://duneawakening.com" }] },
+  { id: "prophecy-s2", kind: "Série", title: "Dune: Prophecy — saison 2", date: null, where: "HBO", note: "Tournage lancé le 11 novembre 2025 (communiqué Warner Bros. Discovery), huit épisodes. HBO l’avait inscrite dans sa bande-annonce « 2026 » ; en octobre 2026, la presse penche pour 2027.", links: [{ label: "Dossier officiel WBD", href: "https://press.wbd.com/na/property/dune-prophecy" }] },
   { id: "awakening-consoles", kind: "Jeu", title: "Dune: Awakening sur PS5 et Xbox Series X|S", date: "2026-09-22", where: "Sortie consoles", note: "Mode solo complet, Xbox Game Pass le même jour.", links: [{ label: "Site officiel", href: "https://duneawakening.com" }] },
+  { id: "reprise-2026", kind: "Film", title: "Dune et Dune : Deuxième Partie de retour en salles", date: "2026-11-11", where: "Ressortie en France", note: "Les deux premiers volets ressortent avant la Troisième Partie, à l’initiative de Warner. Séances à venir.", links: [{ label: "X · @dunemovie", href: "https://x.com/dunemovie" }] },
   { id: "lynch-reprise", kind: "Film", title: "Dune (1984) de retour en salles", date: "2026-05-13", where: "Ressortie en France" },
 ];
