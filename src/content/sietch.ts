@@ -233,14 +233,14 @@ export const PLACES: Place[] = [
   { id: "pole-sud", name: "Pôle Sud", x: 300, y: 370, kind: "Calotte", text: "Officiellement inhabitable. Officieusement, le cœur du monde fremen : des réserves d'eau cachées et un rêve patient de verdure.", termId: undefined },
 ];
 
-export type Era = { when: string; title: string; text: string; key?: boolean };
+export type Era = { when: string; title: string; text: string; key?: boolean; /** Repère « vous êtes ici » (l'année du roman Dune). */ here?: boolean };
 
 /** Chronologie indicative, en années du calendrier de la Guilde (av. G. / ap. G.), d'après les appendices des romans ; ≈ marque une estimation. */
 export const TIMELINE: Era[] = [
   { when: "≈ 201 à 108 av. G.", title: "Le Jihad butlérien", text: "L'humanité se soulève contre les machines pensantes. Au bout d'un siècle de guerre, un interdit : plus aucune machine à l'image de l'esprit humain. Mentats, Navigateurs et Bene Gesserit naîtront de ce vide.", key: true },
   { when: "≈ 88 av. G.", title: "La bataille de Corrin", text: "La Maison qui l'emporte prend le nom de Corrino et le trône impérial, qu'elle gardera dix mille ans." },
   { when: "An 0", title: "Fondation de la Guilde spatiale", text: "Le monopole du voyage entre les étoiles est établi. Le calendrier de l'Imperium commence ici.", key: true },
-  { when: "≈ 10 191 ap. G.", title: "Les Atréides arrivent sur Arrakis", text: "Le roman Dune s'ouvre. L'Empereur confie la planète de l'épice au duc Leto, et le piège se referme.", key: true },
+  { when: "≈ 10 191 ap. G.", title: "Les Atréides arrivent sur Arrakis", text: "Le roman Dune s'ouvre. L'Empereur confie la planète de l'épice au duc Leto, et le piège se referme.", key: true, here: true },
   { when: "≈ 10 193 ap. G.", title: "La chute de Shaddam IV", text: "Les Fremen renversent l'ordre impérial. Un nouvel empereur, venu du désert, voit l'avenir et s'en effraie." },
   { when: "≈ 10 205 ap. G.", title: "Après douze ans de Jihad", text: "Le Messie de Dune : la guerre sainte menée au nom de Muad'Dib a embrasé l'Imperium. L'empereur cherche une sortie." },
   { when: "≈ 10 219 ap. G.", title: "Leto II monte sur le trône", text: "Les Enfants de Dune : l'un des jumeaux accepte un destin que son père avait refusé, et commence à changer de nature." },
@@ -268,3 +268,166 @@ export const RELEASES: Release[] = [
   { id: "awakening-consoles", kind: "Jeu", title: "Dune: Awakening sur PS5 et Xbox Series X|S", date: "2026-09-22", where: "Sortie consoles", note: "Mode solo complet, Xbox Game Pass le même jour.", links: [{ label: "Site officiel", href: "https://duneawakening.com" }] },
   { id: "lynch-reprise", kind: "Film", title: "Dune (1984) de retour en salles", date: "2026-05-13", where: "Ressortie en France" },
 ];
+
+/* ---- C2 · Compte à rebours de la console ------------------------------------------------------------------ */
+
+/**
+ * Dune : Troisième Partie — dates ISO pour le compte à rebours de la console (jours civils calculés chez le visiteur).
+ * Ce sont les mêmes dates que FILMS (villeneuve-2026) et RELEASES (dune-3), vérifiées le 18/10/2026 (docs/sources.md) ;
+ * un test unitaire garantit qu'elles restent identiques. À corriger ici aussi si les dates changent.
+ */
+export const PART_THREE = {
+  filmId: "villeneuve-2026",
+  releaseId: "dune-3",
+  title: "Dune : Troisième Partie",
+  /** Sortie en France (AAAA-MM-JJ). */
+  fr: "2026-12-16",
+  /** Sortie aux États-Unis (AAAA-MM-JJ). */
+  us: "2026-12-18",
+} as const;
+
+/* ---- C2 · Guide de lecture interactif --------------------------------------------------------------------- */
+
+export type ReadingQuestionId = "films" | "envie" | "rythme";
+export type ReadingOption = { id: string; label: string };
+export type ReadingQuestion = { id: ReadingQuestionId; label: string; options: ReadingOption[] };
+
+/** Trois questions courtes, à boutons ; chaque combinaison de réponses mène à un parcours de READING_PATHS. */
+export const READING_QUESTIONS: ReadingQuestion[] = [
+  { id: "films", label: "Vous avez vu les films de Denis Villeneuve ?", options: [{ id: "oui", label: "Oui" }, { id: "non", label: "Non" }] },
+  { id: "envie", label: "Vous cherchez :", options: [{ id: "histoire", label: "Une seule histoire complète" }, { id: "saga", label: "Toute la saga" }, { id: "origines", label: "L’origine de l’univers" }] },
+  { id: "rythme", label: "Plutôt :", options: [{ id: "dense", label: "Un roman dense" }, { id: "rapide", label: "Une lecture plus rapide" }] },
+];
+
+export type ReadingAnswers = Partial<Record<ReadingQuestionId, string>>;
+
+export type ReadingPath = {
+  id: string;
+  /** Réponses requises (identifiants d'options) ; une question absente accepte toute réponse. */
+  match: ReadingAnswers;
+  /** Titre par lequel commencer : un roman de NOVELS (titre français) ou un livre d'EXPANDED (titre original). */
+  start: string;
+  /** Auteur(s), année de parution (docs/sources.md), cycle. */
+  meta: string;
+  /** Ordre suggéré, une étape par entrée. */
+  order: string[];
+  /** Pourquoi, en deux ou trois lignes — texte écrit pour ce site, sans citation des livres. */
+  why: string;
+};
+
+const SIX = ["Dune", "Le Messie de Dune", "Les Enfants de Dune", "L’Empereur-Dieu de Dune", "Les Hérétiques de Dune", "La Maison des Mères"];
+const ORIGINS_ORDER = [
+  "Legends of Dune : The Butlerian Jihad, The Machine Crusade, The Battle of Corrin",
+  "Great Schools of Dune : Sisterhood of Dune, Mentats of Dune, Navigators of Dune",
+  "Dune, pour mesurer dix mille ans plus tard ce qu’il en reste",
+];
+const SCHOOLS_ORDER = [
+  "Great Schools of Dune : Sisterhood of Dune, Mentats of Dune, Navigators of Dune",
+  "Legends of Dune, pour remonter encore — ou Dune, pour redescendre",
+];
+
+/** Les douze parcours (2 × 3 × 2 réponses) : le premier dont toutes les conditions sont remplies l'emporte. */
+export const READING_PATHS: ReadingPath[] = [
+  {
+    id: "relire-dune",
+    match: { films: "oui", envie: "histoire", rythme: "dense" },
+    start: "Dune",
+    meta: "Frank Herbert · 1965",
+    order: ["Dune, appendices compris", "Le Messie de Dune, si l’envie de la suite vient"],
+    why: "Les deux films suivent le premier roman ; le livre, lui, donne ce que l’écran tait : les pensées de chacun, les appendices, le glossaire. Même en connaissant la fin, c’est une histoire complète — et elle n’a pas besoin de suite.",
+  },
+  {
+    id: "messie-direct",
+    match: { films: "oui", envie: "histoire", rythme: "rapide" },
+    start: "Le Messie de Dune",
+    meta: "Frank Herbert · 1969",
+    order: ["Le Messie de Dune", "Les Enfants de Dune, pour refermer l’histoire de la famille", "Dune, plus tard, pour revenir au début"],
+    why: "Les films vous ont raconté le premier roman ; inutile de le relire pour comprendre la suite. Le Messie reprend douze ans plus tard : un livre court, qui dit le prix de la victoire. Les Enfants referme ensuite l’histoire de la famille.",
+  },
+  {
+    id: "dune-seul",
+    match: { films: "non", envie: "histoire", rythme: "dense" },
+    start: "Dune",
+    meta: "Frank Herbert · 1965",
+    order: ["Dune, appendices compris — rien d’autre n’est nécessaire"],
+    why: "Le premier roman est une histoire entière, avec sa fin. Lisez-le sans rien autour, appendices compris : le glossaire de la fin répond à la plupart des questions. Si l’envie vient ensuite, Le Messie de Dune attend douze ans plus tard.",
+  },
+  {
+    id: "films-puis-dune",
+    match: { films: "non", envie: "histoire", rythme: "rapide" },
+    start: "Dune",
+    meta: "Frank Herbert · 1965",
+    order: ["Les deux films de Denis Villeneuve (2021, 2024), en guise de carte", "Dune, le roman"],
+    why: "Pas de raccourci : le premier roman est la seule porte, mais il se suffit à lui-même. Pour aller plus vite, voyez d’abord les deux films : ils racontent ce même livre, en deux moitiés. Le texte, ensuite, file — et l’on y découvre tout ce que l’écran a laissé de côté.",
+  },
+  {
+    id: "saga-complete-films",
+    match: { films: "oui", envie: "saga", rythme: "dense" },
+    start: "Dune",
+    meta: "Frank Herbert · 1965 — puis les cinq suivants, jusqu’en 1985",
+    order: SIX,
+    why: "Les films vous ont donné le premier roman en images ; le livre, lui, pose tout ce que les cinq suivants déploient. Ordre de publication, sans sauter : chaque roman change le sens du précédent, et Frank Herbert a écrit les six en vingt ans. L’univers étendu vient après, jamais avant.",
+  },
+  {
+    id: "saga-complete",
+    match: { films: "non", envie: "saga", rythme: "dense" },
+    start: "Dune",
+    meta: "Frank Herbert · 1965 — puis les cinq suivants, jusqu’en 1985",
+    order: SIX,
+    why: "L’ordre de publication est le bon : chaque roman change le sens du précédent, et Frank Herbert les a écrits en vingt ans, de 1965 à 1985. Les trois premiers forment un arc ; le quatrième saute trois millénaires et change de registre ; les deux derniers vont ensemble. L’univers étendu vient après, jamais avant.",
+  },
+  {
+    id: "saga-depuis-messie",
+    match: { films: "oui", envie: "saga", rythme: "rapide" },
+    start: "Le Messie de Dune",
+    meta: "Frank Herbert · 1969",
+    order: [...SIX.slice(1), "Dune, pour finir par le commencement"],
+    why: "Puisque les films vous ont raconté le premier roman, entrez dans la saga par sa suite : Le Messie, court, puis Les Enfants, et ainsi de suite dans l’ordre de publication. Revenez à Dune quand vous voudrez le texte lui-même — il n’aura rien perdu.",
+  },
+  {
+    id: "saga-en-deux-temps",
+    match: { films: "non", envie: "saga", rythme: "rapide" },
+    start: "Dune",
+    meta: "Frank Herbert · 1965",
+    order: [...SIX.slice(0, 3), "— une pause, aussi longue qu’il faut —", ...SIX.slice(3)],
+    why: "Toute la saga, mais en deux temps. Les trois premiers romans se lisent d’affilée et referment l’histoire de la famille ; beaucoup s’arrêtent là, sans regret. Les trois derniers changent d’époque et de registre : reprenez-les plus tard, l’un après l’autre.",
+  },
+  {
+    id: "origines-jihad",
+    match: { films: "oui", envie: "origines", rythme: "dense" },
+    start: "The Butlerian Jihad",
+    meta: "Brian Herbert et Kevin J. Anderson · 2002 · cycle Legends of Dune",
+    order: ORIGINS_ORDER,
+    why: "Dix mille ans avant les films : la guerre contre les machines pensantes, puis la naissance des grandes écoles. Six romans dans l’ordre de l’histoire, écrits de 2002 à 2016. Comme les films vous ont donné le récit principal, ces origines ne vous gâcheront aucune surprise.",
+  },
+  {
+    id: "origines-jihad-avertissement",
+    match: { films: "non", envie: "origines", rythme: "dense" },
+    start: "The Butlerian Jihad",
+    meta: "Brian Herbert et Kevin J. Anderson · 2002 · cycle Legends of Dune",
+    order: ORIGINS_ORDER,
+    why: "Dix mille ans avant Dune : la guerre contre les machines pensantes, puis la naissance des grandes écoles — six romans dans l’ordre de l’histoire. Un avertissement, pourtant : ces préquelles expliquent ce que Frank Herbert laissait dans l’ombre. Si le mystère vous importe, lisez d’abord Dune, puis revenez ici.",
+  },
+  {
+    id: "origines-ecoles",
+    match: { films: "oui", envie: "origines", rythme: "rapide" },
+    start: "Sisterhood of Dune",
+    meta: "Brian Herbert et Kevin J. Anderson · 2012 · cycle Great Schools of Dune",
+    order: SCHOOLS_ORDER,
+    why: "Trois romans au lieu de six : le chemin le plus court vers la fondation des grandes écoles — Sœurs, Mentats, Navigateurs —, et c’est le cycle dont s’inspire la série Dune: Prophecy. La guerre contre les machines, racontée dans Legends of Dune, peut attendre.",
+  },
+  {
+    id: "origines-ecoles-avertissement",
+    match: { films: "non", envie: "origines", rythme: "rapide" },
+    start: "Sisterhood of Dune",
+    meta: "Brian Herbert et Kevin J. Anderson · 2012 · cycle Great Schools of Dune",
+    order: SCHOOLS_ORDER,
+    why: "Trois romans au lieu de six : la fondation des grandes écoles, le cycle dont s’inspire la série Dune: Prophecy. Mais ces préquelles racontent ce que Frank Herbert laissait dans l’ombre : sans avoir lu ni vu Dune, vous lisez l’histoire à l’envers. Cela se fait — sachez-le seulement.",
+  },
+];
+
+/** Parcours recommandé pour un jeu de réponses complet ; null tant qu'une question reste sans réponse. */
+export function recommendReading(answers: ReadingAnswers): ReadingPath | null {
+  if (READING_QUESTIONS.some((q) => !answers[q.id])) return null;
+  return READING_PATHS.find((p) => (Object.keys(p.match) as ReadingQuestionId[]).every((k) => answers[k] === p.match[k])) ?? null;
+}
