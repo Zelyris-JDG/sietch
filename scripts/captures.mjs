@@ -2,7 +2,7 @@
  * Captures mobile + bureau de chaque scène, dans docs/captures/<label>/. Usage :
  *   node scripts/captures.mjs --label=phase2 [--url=http://127.0.0.1:3100] [--wait=1600] [--only=desert,epice] [--view=bureau]
  * --wait : délai (ms) après chaque saut de défilement — plus long sous SwiftShader (rendu logiciel lent), pour laisser
- * la caméra converger comme dans un vrai navigateur.
+ * la caméra converger comme dans un vrai navigateur. --reduce : navigateur en « mouvement réduit » (version calme).
  */
 import { chromium } from "@playwright/test";
 import { mkdirSync } from "node:fs";
@@ -14,7 +14,7 @@ async function shot(page, path) {
   await sharp(buf).webp({ quality: 82 }).toFile(path);
 }
 
-const args = Object.fromEntries(process.argv.slice(2).map((s) => { const i = s.indexOf("="); return [s.slice(2, i), s.slice(i + 1)]; }));
+const args = Object.fromEntries(process.argv.slice(2).map((s) => { const i = s.indexOf("="); return i < 0 ? [s.slice(2), "1"] : [s.slice(2, i), s.slice(i + 1)]; }));
 const label = args.label ?? "captures";
 const url = args.url ?? "http://127.0.0.1:3100";
 const dir = `docs/captures/${label}`;
@@ -31,7 +31,7 @@ const allViews = views.filter((v) => !args.view || v.name === args.view);
 
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 for (const v of allViews) {
-  const ctx = await browser.newContext({ viewport: v.viewport, isMobile: v.isMobile, hasTouch: v.hasTouch, deviceScaleFactor: v.deviceScaleFactor ?? 1, locale: "fr-FR" });
+  const ctx = await browser.newContext({ viewport: v.viewport, isMobile: v.isMobile, hasTouch: v.hasTouch, deviceScaleFactor: v.deviceScaleFactor ?? 1, locale: "fr-FR", reducedMotion: "reduce" in args ? "reduce" : "no-preference" });
   const page = await ctx.newPage();
   await page.goto(url, { waitUntil: "networkidle" });
   if (!only) await shot(page, `${dir}/${v.name}-00-intro.webp`);
