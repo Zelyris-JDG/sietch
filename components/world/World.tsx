@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { StillWorld } from "./StillWorld";
 import { deviceTier, prefersReducedMotion, webglAvailable } from "../../src/lib/prefs";
+import { storageKeys } from "../../src/config/site";
 
 const GlWorld = dynamic(() => import("./GlWorld").then((m) => m.GlWorld), { ssr: false });
 
@@ -37,6 +38,11 @@ export function World() {
     };
     document.addEventListener("sietch:enter", start);
     gestures.forEach((g) => window.addEventListener(g, start, { passive: true }));
+    // Intro déjà vue dans la session (retour d'une page) : elle ne s'affichera pas et son événement « sietch:enter »
+    // peut partir avant que cet écouteur n'existe — on démarre tout de suite.
+    let seen = false;
+    try { seen = sessionStorage.getItem(storageKeys.introSeen) === "1"; } catch { /* navigation privée */ }
+    if (seen) { start(); return; }
     const idle = () => { timer = window.setTimeout(start, 6000); };
     if (document.readyState === "complete") idle();
     else window.addEventListener("load", idle, { once: true });
