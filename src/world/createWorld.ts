@@ -6,7 +6,7 @@
 import * as THREE from "three";
 import { state, clamp01, lerp, smoothstep } from "../lib/store";
 import { duneBase } from "./dunes";
-import { DUNE_FRAG, DUNE_VERT, HALO_FRAG, HALO_VERT, HULL_FRAG, HULL_VERT, PARTICLE_FRAG, PARTICLE_VERT, PLANET_FRAG, PLANET_VERT, SKY_FRAG, SKY_VERT, WIND_VERT } from "./shaders";
+import { DUNE_FRAG, DUNE_VERT, GLOW_FRAG, GLOW_VERT, HALO_FRAG, HALO_VERT, HULL_FRAG, HULL_VERT, LIGHT_FRAG, LIGHT_VERT, PARTICLE_FRAG, PARTICLE_VERT, PLANET_FRAG, PLANET_VERT, SKY_FRAG, SKY_VERT, WIND_VERT } from "./shaders";
 
 export type WorldOptions = { tier: "low" | "mid" | "high" };
 
@@ -107,7 +107,9 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   // Le long-courrier : un fuseau de 300 unités, des anneaux de structure, une peau de modules, des feux de position.
   const ship = new THREE.Group();
   space.add(ship);
-  const hullMat = keep(new THREE.ShaderMaterial({ vertexShader: HULL_VERT, fragmentShader: HULL_FRAG, uniforms: { uSunDir: { value: new THREE.Vector3(-0.89, -0.11, 0.44).normalize() }, uShineDir: { value: new THREE.Vector3(0.1, -1, 0.25).normalize() }, uTime: { value: 0 } } }));
+  // Directions en espace monde : froide de dessus-arrière (dos du fuseau, liseré), chaude et rasante depuis la
+  // gauche-bas (le ventre que l'on voit depuis la soute se dégrade du clair au sombre : le volume se lit).
+  const hullMat = keep(new THREE.ShaderMaterial({ vertexShader: HULL_VERT, fragmentShader: HULL_FRAG, uniforms: { uSunDir: { value: new THREE.Vector3(0.6, 0.7, -0.4).normalize() }, uShineDir: { value: new THREE.Vector3(-0.55, -0.75, 0.2).normalize() }, uTime: { value: 0 } } }));
   const ribMat = keep(new THREE.MeshStandardMaterial({ color: 0x8a7462, roughness: 0.55, metalness: 0.25, emissive: 0x2a1608, emissiveIntensity: 0.8 }));
   const profile: THREE.Vector2[] = [];
   const SHIP_L = 320;
@@ -136,58 +138,159 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       ship.add(strut);
     }
   }
-  const moduleCount = pick(1400, 900, 500);
-  const modules = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(1, 1, 1)), keep(new THREE.MeshStandardMaterial({ color: 0x7c6a5a, roughness: 0.8, metalness: 0.15, emissive: 0x120a05 })), moduleCount);
+  /* Profil lisse du fuseau (sans ses bourrelets) et pente locale : tout ce qui se pose sur la coque suit la surface. */
+  const hullR = (t: number) => 2 + 12 * Math.sin(Math.PI * Math.min(Math.max(t, 0.001), 0.999)) ** 0.55;
+  const hullSlope = (t: number) => Math.atan2(hullR(t + 0.004) - hullR(t - 0.004), 0.008 * SHIP_L);
   const dummy = new THREE.Object3D();
+  // Modules : plats, posés sur la coque, groupés en « quartiers » (densité par bandes) ; teinte peu contrastée pour
+  // lire d'abord les grandes tôles, puis les détails.
+  const moduleCount = pick(1400, 900, 420);
+  const modules = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(1, 1, 1)), keep(new THREE.MeshStandardMaterial({ color: 0x5c4e42, roughness: 0.78, metalness: 0.2, emissive: 0x0d0804 })), moduleCount);
+  const quarters: [number, number, number][] = [[0.2, 0.6, 1.0], [0.34, 2.9, 1.3], [0.47, 1.2, 0.9], [0.58, 4.6, 1.1], [0.69, 2.2, 1.0], [0.8, 5.4, 0.8]];
   for (let i = 0; i < moduleCount; i++) {
-    const t = rand();
-    const a = rand() * Math.PI * 2;
-    const r = 2 + 12 * Math.sin(Math.PI * t) ** 0.55 + 0.5;
+    const q = quarters[i % quarters.length];
+    const t = Math.min(0.92, Math.max(0.08, q[0] + (rand() + rand() - 1) * 0.09));
+    const a = q[1] + (rand() + rand() - 1) * q[2] + (rand() < 0.15 ? Math.PI : 0);
+    const h = 0.25 + rand() * 0.55;
+    const r = hullR(t) + h / 2 - 0.05 + 0.9 * Math.sin(40 * t) * Math.sin(Math.PI * t);
     dummy.position.set((t - 0.5) * SHIP_L, Math.cos(a) * r, Math.sin(a) * r);
-    dummy.rotation.set(a, 0, 0);
-    dummy.scale.set(1 + rand() * 4, 0.6 + rand() * 1.6, 0.6 + rand() * 1.4);
+    dummy.rotation.set(a, 0, hullSlope(t), "XZY");
+    dummy.scale.set(1.2 + rand() * 4.5, h, 0.7 + rand() * 1.6);
     dummy.updateMatrix();
     modules.setMatrixAt(i, dummy.matrix);
   }
   modules.instanceMatrix.needsUpdate = true;
   const tint = new THREE.Color();
   for (let i = 0; i < moduleCount; i++) {
-    const v = 0.55 + rand() * 0.9;
-    modules.setColorAt(i, tint.setRGB(0.52 * v, 0.44 * v, 0.37 * v));
+    const v = 0.82 + rand() * 0.36;
+    modules.setColorAt(i, tint.setRGB(0.52 * v, 0.45 * v, 0.38 * v));
   }
   if (modules.instanceColor) modules.instanceColor.needsUpdate = true;
   ship.add(modules);
-  // Bandes de hublots : fines lignes émissives le long de la coque (échelle et habitation).
-  const stripMat = keep(new THREE.MeshBasicMaterial({ color: 0xf2b544, transparent: true, opacity: 0.85 }));
-  const stripGeo = keep(new THREE.BoxGeometry(1, 0.18, 0.18));
-  for (let i = 0; i < 36; i++) {
-    const t = 0.12 + rand() * 0.76;
-    const a = rand() * Math.PI * 2;
-    const r = 2 + 12 * Math.sin(Math.PI * t) ** 0.55 + 0.9;
+  // Rails longitudinaux : fins, en segments courts qui épousent le profil, à six angles fixes ; deux d'entre eux
+  // portent les feux de bord (rouge d'un côté, vert de l'autre : des feux de navigation réinventés).
+  const railAngles = [0.35, 1.45, 2.45, 3.5, 4.55, 5.7];
+  const RAIL_SEG = pick(24, 16, 12);
+  const railMat = keep(new THREE.MeshStandardMaterial({ color: 0x3a3028, roughness: 0.45, metalness: 0.55, emissive: 0x0a0604 }));
+  const rails = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(1, 0.42, 0.55)), railMat, railAngles.length * RAIL_SEG);
+  let ri = 0;
+  for (const a of railAngles) {
+    for (let k = 0; k < RAIL_SEG; k++) {
+      const t0 = 0.1 + (k / RAIL_SEG) * 0.8, t1 = 0.1 + ((k + 1) / RAIL_SEG) * 0.8;
+      const rr = (t: number) => hullR(t) + 0.55 + 1.5 * Math.sin(40 * t) * Math.sin(Math.PI * t);
+      const r0 = rr(t0), r1 = rr(t1), tm = (t0 + t1) / 2, rm = (r0 + r1) / 2;
+      const len = Math.hypot((t1 - t0) * SHIP_L, r1 - r0) + 0.4;
+      dummy.position.set((tm - 0.5) * SHIP_L, Math.cos(a) * rm, Math.sin(a) * rm);
+      dummy.rotation.set(a, 0, Math.atan2(r1 - r0, (t1 - t0) * SHIP_L), "XZY");
+      dummy.scale.set(len, 1, 1);
+      dummy.updateMatrix();
+      rails.setMatrixAt(ri++, dummy.matrix);
+    }
+  }
+  rails.instanceMatrix.needsUpdate = true;
+  ship.add(rails);
+  // Collier d'amarrage autour de la soute (t ≈ 0,31 : la soute est sous ce point de la coque), avec ses plots.
+  const T_BAY = 0.31;
+  const collarR = hullR(T_BAY) + 2.4;
+  const collarMat = keep(new THREE.MeshStandardMaterial({ color: 0x6d5a48, roughness: 0.5, metalness: 0.45, emissive: 0x1a0e06, emissiveIntensity: 0.6 }));
+  const collar = new THREE.Mesh(keep(new THREE.TorusGeometry(collarR, 1.7, 10, pick(96, 64, 48))), collarMat);
+  collar.position.x = (T_BAY - 0.5) * SHIP_L;
+  collar.rotation.y = Math.PI / 2;
+  ship.add(collar);
+  const plots = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(2.4, 1.4, 2.2)), collarMat, 12);
+  for (let k = 0; k < 12; k++) {
+    const a = (k / 12) * Math.PI * 2 + 0.26;
+    dummy.position.set(collar.position.x, Math.cos(a) * (collarR + 1.6), Math.sin(a) * (collarR + 1.6));
+    dummy.rotation.set(-a, 0, 0, "XYZ");
+    dummy.scale.setScalar(1);
+    dummy.updateMatrix();
+    plots.setMatrixAt(k, dummy.matrix);
+  }
+  plots.instanceMatrix.needsUpdate = true;
+  ship.add(plots);
+  // Mâts et antennes : fines tiges radiales (un seul appel de dessin), un feu blanc à éclats à leur sommet.
+  const masts: [number, number, number][] = [[0.17, 0.9, 9], [0.26, 3.6, 12], [0.4, 5.2, 7], [0.52, 1.9, 14], [0.63, 0.3, 8], [0.74, 4.2, 11], [0.86, 2.6, 6], [0.46, 3.0, 5]];
+  const mastMesh = new THREE.InstancedMesh(keep(new THREE.BoxGeometry(0.3, 1, 0.3)), railMat, masts.length);
+  const mastTips: number[] = [];
+  masts.forEach(([t, a, h], k) => {
+    const base = hullR(t) + 1.5 * Math.sin(40 * t) * Math.sin(Math.PI * t);
+    dummy.position.set((t - 0.5) * SHIP_L, Math.cos(a) * (base + h / 2), Math.sin(a) * (base + h / 2));
+    dummy.rotation.set(a, 0, 0, "XZY");
+    dummy.scale.set(1, h, 1);
+    dummy.updateMatrix();
+    mastMesh.setMatrixAt(k, dummy.matrix);
+    mastTips.push((t - 0.5) * SHIP_L, Math.cos(a) * (base + h + 0.3), Math.sin(a) * (base + h + 0.3));
+  });
+  mastMesh.instanceMatrix.needsUpdate = true;
+  ship.add(mastMesh);
+  // Bandes de hublots : fines lignes émissives le long de la coque (échelle et habitation), alignées sur les quartiers.
+  const stripMat = keep(new THREE.MeshBasicMaterial({ color: 0xf2b544, transparent: true, opacity: 0.8 }));
+  const stripGeo = keep(new THREE.BoxGeometry(1, 0.16, 0.16));
+  for (let i = 0; i < 30; i++) {
+    const q = quarters[i % quarters.length];
+    const t = Math.min(0.9, Math.max(0.1, q[0] + (rand() - 0.5) * 0.12));
+    const a = q[1] + (rand() - 0.5) * q[2] * 1.4;
+    const r = hullR(t) + 0.95 + 1.5 * Math.sin(40 * t) * Math.sin(Math.PI * t);
     const strip = new THREE.Mesh(stripGeo, stripMat);
     strip.position.set((t - 0.5) * SHIP_L, Math.cos(a) * r, Math.sin(a) * r);
-    strip.rotation.x = a;
-    strip.scale.x = 4 + rand() * 18;
+    strip.rotation.set(a, 0, hullSlope(t), "XZY");
+    strip.scale.x = 4 + rand() * 16;
     ship.add(strip);
   }
-  const lightCount = pick(420, 260, 160);
-  const lightPos = new Float32Array(lightCount * 3);
-  const lightCol = new Float32Array(lightCount * 3);
-  for (let i = 0; i < lightCount; i++) {
-    const t = rand(); const a = rand() * Math.PI * 2;
-    const r = 2 + 12 * Math.sin(Math.PI * t) ** 0.55 + 1.2 + (rand() < 0.3 ? 14 + 12 * Math.sin(Math.PI * t) : 0);
-    lightPos[i * 3] = (t - 0.5) * SHIP_L; lightPos[i * 3 + 1] = Math.cos(a) * r; lightPos[i * 3 + 2] = Math.sin(a) * r;
-    const warm = rand() < 0.75;
-    lightCol[i * 3] = warm ? 0.95 : 0.6; lightCol[i * 3 + 1] = warm ? 0.7 : 0.75; lightCol[i * 3 + 2] = warm ? 0.3 : 1.0;
+  /* Feux : nuanceur de points (disques doux, halo, clignotement par graine). Trois familles : feux de bord rouge /
+     vert sur deux rails opposés, feux blancs à éclats aux sommets des mâts et sur les anneaux, feux ambre de
+     travail près de la soute et des quartiers. Jamais une référence à un design existant. */
+  const lightMat = keep(new THREE.ShaderMaterial({
+    vertexShader: LIGHT_VERT, fragmentShader: LIGHT_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { uTime: { value: 0 }, uPixelRatio: { value: pixelRatio }, uFade: { value: 1 }, uMax: { value: pick(12, 9, 6) } }, // taille maximale d'un feu proche (pixels avant densité) : le halo coûte en remplissage
+  }));
+  type LightSpec = { x: number; y: number; z: number; r: number; g: number; b: number; size: number; seed: number };
+  const lightList: LightSpec[] = [];
+  const addLight = (x: number, y: number, z: number, rgb: [number, number, number], size: number, seed: number) => lightList.push({ x, y, z, r: rgb[0], g: rgb[1], b: rgb[2], size, seed });
+  const RED: [number, number, number] = [1.0, 0.22, 0.14], GREEN: [number, number, number] = [0.25, 1.0, 0.45], WHITE: [number, number, number] = [1.0, 0.96, 0.9], AMBER: [number, number, number] = [1.0, 0.7, 0.28];
+  const bordCount = pick(14, 10, 7);
+  for (let k = 0; k < bordCount; k++) {
+    const t = 0.12 + (k / (bordCount - 1)) * 0.76;
+    for (const [a, c] of [[railAngles[1], RED], [railAngles[4], GREEN]] as [number, [number, number, number]][]) {
+      const r = hullR(t) + 1.2 + 1.5 * Math.sin(40 * t) * Math.sin(Math.PI * t);
+      addLight((t - 0.5) * SHIP_L, Math.cos(a) * r, Math.sin(a) * r, c, 2.6, 0.2 + rand() * 0.5);
+    }
+  }
+  for (let k = 0; k < mastTips.length; k += 3) addLight(mastTips[k], mastTips[k + 1], mastTips[k + 2], WHITE, 3.4, 0.8 + rand() * 0.2);
+  for (let i = 0; i < 5; i++) {
+    const t = (i + 0.5) / 5, r = 15 + 9 * Math.sin(Math.PI * t) + 0.9;
+    for (let k = 0; k < 6; k++) {
+      const a = (k / 6) * Math.PI * 2 + 0.5;
+      addLight((t - 0.5) * SHIP_L, Math.cos(a) * r, Math.sin(a) * r, k % 3 === 0 ? WHITE : AMBER, 2.2, k % 3 === 0 ? 0.78 + rand() * 0.2 : rand() * 0.7);
+    }
+  }
+  const workCount = pick(220, 130, 70);
+  for (let i = 0; i < workCount; i++) {
+    const q = quarters[i % quarters.length];
+    const t = Math.min(0.92, Math.max(0.08, q[0] + (rand() + rand() - 1) * 0.1));
+    const a = q[1] + (rand() + rand() - 1) * q[2] * 1.2;
+    const r = hullR(t) + 1.0 + 1.5 * Math.sin(40 * t) * Math.sin(Math.PI * t);
+    addLight((t - 0.5) * SHIP_L, Math.cos(a) * r, Math.sin(a) * r, rand() < 0.8 ? AMBER : WHITE, 1.3 + rand() * 1.4, rand() * 0.74);
+  }
+  for (let k = 0; k < 10; k++) {
+    const a = (k / 10) * Math.PI * 2 + 0.26 + Math.PI / 10;
+    addLight(collar.position.x, Math.cos(a) * (collarR + 2.6), Math.sin(a) * (collarR + 2.6), AMBER, 2.4, 0.3 + rand() * 0.4);
   }
   const lightsGeo = keep(new THREE.BufferGeometry());
+  const lightPos = new Float32Array(lightList.length * 3), lightCol = new Float32Array(lightList.length * 3), lightSeed = new Float32Array(lightList.length), lightSize = new Float32Array(lightList.length);
+  lightList.forEach((l, i) => { lightPos.set([l.x, l.y, l.z], i * 3); lightCol.set([l.r, l.g, l.b], i * 3); lightSeed[i] = l.seed; lightSize[i] = l.size; });
   lightsGeo.setAttribute("position", new THREE.BufferAttribute(lightPos, 3));
-  lightsGeo.setAttribute("color", new THREE.BufferAttribute(lightCol, 3));
-  const shipLights = new THREE.Points(lightsGeo, keep(new THREE.PointsMaterial({ size: 3.2, vertexColors: true, sizeAttenuation: true, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending })));
+  lightsGeo.setAttribute("aColor", new THREE.BufferAttribute(lightCol, 3));
+  lightsGeo.setAttribute("aSeed", new THREE.BufferAttribute(lightSeed, 1));
+  lightsGeo.setAttribute("aSize", new THREE.BufferAttribute(lightSize, 1));
+  const shipLights = new THREE.Points(lightsGeo, lightMat);
+  shipLights.frustumCulled = false;
   ship.add(shipLights);
-  // Frégates : minuscules fuseaux près de la coque.
-  const frigateCount = 18;
-  const frigates = new THREE.InstancedMesh(keep(new THREE.CapsuleGeometry(0.16, 1.4, 3, 6)), keep(new THREE.MeshStandardMaterial({ color: 0x6a5c50, roughness: 0.6, metalness: 0.4, emissive: 0x1a1008 })), frigateCount);
+  // Frégates : minuscules fuseaux qui dérivent le long de la coque.
+  const frigateCount = 14;
+  const frigateGeo = keep(new THREE.CapsuleGeometry(0.16, 1.4, 3, 6));
+  const frigateMat = keep(new THREE.MeshStandardMaterial({ color: 0x6a5c50, roughness: 0.6, metalness: 0.4, emissive: 0x1a1008 }));
+  const frigates = new THREE.InstancedMesh(frigateGeo, frigateMat, frigateCount);
   const frigateSeeds: number[] = [];
   for (let i = 0; i < frigateCount; i++) {
     frigateSeeds.push(rand() * Math.PI * 2, 30 + rand() * 40, (rand() - 0.5) * SHIP_L * 0.9, 0.2 + rand() * 0.5);
@@ -196,18 +299,96 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   // La soute : cinq arceaux horizontaux sous le vaisseau, que la frégate traverse en sortant.
   const bay = new THREE.Group();
   const bayMat = keep(new THREE.MeshStandardMaterial({ color: 0x2a221c, roughness: 0.9, metalness: 0.3, emissive: 0x2a1a0a, emissiveIntensity: 0.8 }));
+  // Le dernier arceau est la bouche : un anneau de lampes ambre, plus lumineux à mesure que l'on sort.
+  const mouthMat = keep(new THREE.MeshStandardMaterial({ color: 0x3a2c20, roughness: 0.6, metalness: 0.3, emissive: 0xe8902a, emissiveIntensity: 0.12 }));
+  const bayLamps: THREE.PointLight[] = [];
   for (let i = 0; i < 6; i++) {
     const r = 26 + i * 2.5;
-    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, 1.1, 8, 72)), bayMat);
+    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, i === 5 ? 1.2 : 1.1, 8, 72)), i === 5 ? mouthMat : bayMat);
     ring.rotation.x = Math.PI / 2;
     ring.position.set(0, -4 - i * 11, 0);
     bay.add(ring);
     const lamp = new THREE.PointLight(0xf2b544, 2600, 120, 2);
     lamp.position.set(r * 0.7, -4 - i * 11, 0);
-    if (high && i % 2 === 0) bay.add(lamp);
+    if (high && i % 2 === 0) { bay.add(lamp); bayLamps.push(lamp); }
   }
+  const MOUTH_Y = -59, MOUTH_R = 38.5;
+  // Feux de la bouche : vingt-quatre ambre tout autour, quatre blancs à éclats aux points cardinaux.
+  const mouthN = 28;
+  const mouthPos = new Float32Array(mouthN * 3), mouthCol = new Float32Array(mouthN * 3), mouthSeed = new Float32Array(mouthN), mouthSize = new Float32Array(mouthN);
+  for (let k = 0; k < mouthN; k++) {
+    const a = (k / mouthN) * Math.PI * 2;
+    const cardinal = k % 7 === 0;
+    mouthPos.set([Math.cos(a) * (MOUTH_R + 0.6), MOUTH_Y - 0.8, Math.sin(a) * (MOUTH_R + 0.6)], k * 3);
+    mouthCol.set(cardinal ? [1.0, 0.96, 0.9] : [1.0, 0.7, 0.28], k * 3);
+    mouthSeed[k] = cardinal ? 0.8 + rand() * 0.2 : rand() * 0.7;
+    mouthSize[k] = cardinal ? 3.6 : 2.6;
+  }
+  const mouthGeo = keep(new THREE.BufferGeometry());
+  mouthGeo.setAttribute("position", new THREE.BufferAttribute(mouthPos, 3));
+  mouthGeo.setAttribute("aColor", new THREE.BufferAttribute(mouthCol, 3));
+  mouthGeo.setAttribute("aSeed", new THREE.BufferAttribute(mouthSeed, 1));
+  mouthGeo.setAttribute("aSize", new THREE.BufferAttribute(mouthSize, 1));
+  const mouthLights = new THREE.Points(mouthGeo, lightMat);
+  mouthLights.frustumCulled = false;
+  bay.add(mouthLights);
+  // Lueur de la bouche : disque additif juste sous le dernier arceau, visible des deux côtés ; son intensité suit la
+  // sortie de soute (« la lumière s'ouvre »).
+  const glowMat = keep(new THREE.ShaderMaterial({
+    vertexShader: GLOW_VERT, fragmentShader: GLOW_FRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+    uniforms: { uColor: { value: new THREE.Color(1.0, 0.66, 0.3) }, uAlpha: { value: 0.1 }, uRing: { value: 0.8 } },
+  }));
+  const mouthGlow = new THREE.Mesh(keep(new THREE.CircleGeometry(MOUTH_R + 2, 48)), glowMat);
+  mouthGlow.rotation.x = Math.PI / 2;
+  mouthGlow.position.y = MOUTH_Y - 1.2;
+  mouthGlow.visible = tier !== "low"; // grand disque additif proche de la caméra : remplissage coûteux sur appareil faible
+  bay.add(mouthGlow);
   bay.position.set(-20, 0, 22);
   space.add(bay);
+  // Poussière en suspension dans la soute : quelques centaines de grains lents autour du point de départ, qui
+  // s'estompent avec la sortie. Rien sur appareil faible (coût inchangé pour ce niveau).
+  const dustCount = pick(360, 220, 0);
+  const dustMat = keep(new THREE.ShaderMaterial({
+    vertexShader: PARTICLE_VERT, fragmentShader: PARTICLE_FRAG, transparent: true, depthWrite: false,
+    uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uSpeed: { value: 0.7 }, uDir: { value: new THREE.Vector3(0.1, -1, 0.05).normalize() }, uSpan: { value: 36 }, uPixelRatio: { value: pixelRatio }, uColor: { value: new THREE.Color(0.95, 0.76, 0.52) } },
+  }));
+  const dust = new THREE.Points(keep(particleGeometry(Math.max(dustCount, 1), new THREE.Vector3(64, 70, 64), rand, 0.7, 2.2)), dustMat);
+  dust.frustumCulled = false;
+  dust.visible = dustCount > 0;
+  space.add(dust);
+  // Navettes : quatre petites frégates qui entrent dans la soute et en ressortent, sur deux boucles fermées
+  // (l'une le miroir de l'autre par rapport à l'axe de la soute), orientées selon la tangente, un feu à éclats chacune.
+  const SHUTTLE_N = 4;
+  const shuttles = new THREE.InstancedMesh(frigateGeo, frigateMat, SHUTTLE_N);
+  shuttles.frustumCulled = false; // la sphère englobante d'un InstancedMesh est figée au premier rendu : elles bougent trop pour elle
+  frigates.frustumCulled = false;
+  space.add(shuttles);
+  const loopBase: [number, number, number][] = [[2, -18, -26], [4, 12, -22], [18, 6, -16], [22, -23, -20], [24, -53, -32], [40, -103, -84], [20, -148, -164], [-20, -108, -134], [-10, -63, -38]];
+  const shuttleCurves: THREE.CatmullRomCurve3[] = [];
+  /* Les boucles sont définies par rapport au point de départ de la caméra (x0, −22, 24), vérifiées en bureau comme en
+     portrait ; le miroir se prend par rapport à l'axe de la soute (x = −20). Reconstruites si x0 change. */
+  let shuttleX0 = NaN;
+  const buildShuttles = (x0: number) => {
+    shuttleX0 = x0;
+    shuttleCurves.length = 0;
+    for (const mirror of [false, true]) {
+      const pts = loopBase.map(([x, y, z]) => new THREE.Vector3(mirror ? -40 - (x0 + x) : x0 + x, -22 + y, 24 + z));
+      shuttleCurves.push(new THREE.CatmullRomCurve3(pts, true, "centripetal", 0.5));
+    }
+  };
+  const shuttlePhase = [0, 0.5, 0.25, 0.75];
+  const shuttleSpeed = [1 / 26, 1 / 26, 1 / 31, 1 / 31];
+  const shuttleGeo = keep(new THREE.BufferGeometry());
+  const shuttlePos = new Float32Array(SHUTTLE_N * 3);
+  shuttleGeo.setAttribute("position", new THREE.BufferAttribute(shuttlePos, 3));
+  shuttleGeo.setAttribute("aColor", new THREE.BufferAttribute(new Float32Array([1, 0.96, 0.9, 1, 0.25, 0.15, 1, 0.96, 0.9, 1, 0.7, 0.28]), 3));
+  shuttleGeo.setAttribute("aSeed", new THREE.BufferAttribute(new Float32Array([0.82, 0.9, 0.86, 0.95]), 1));
+  shuttleGeo.setAttribute("aSize", new THREE.BufferAttribute(new Float32Array([3, 2.6, 3, 2.6]), 1));
+  const shuttleLights = new THREE.Points(shuttleGeo, lightMat);
+  shuttleLights.frustumCulled = false;
+  space.add(shuttleLights);
+  const UP = new THREE.Vector3(0, 1, 0);
+  const tangent = new THREE.Vector3();
   // Axe long du vaisseau le long de Z : vu de dessous, il file vers le point de fuite, au-dessus de la planète.
   ship.rotation.y = Math.PI / 2;
   ship.position.set(0, 22, -40);
@@ -218,9 +399,9 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   if (hide === "planete") { planet.visible = false; halo.visible = false; }
   if (hide === "soute") bay.visible = false;
 
-  const sun = new THREE.DirectionalLight(0xffe7c6, 5.5);
+  const sun = new THREE.DirectionalLight(0xffd9a8, 3.8);
   sun.position.set(-320, -40, 160);
-  const cool = new THREE.DirectionalLight(0x6d8dff, 1.2);
+  const cool = new THREE.DirectionalLight(0x6d8dff, 1.8);
   cool.position.set(260, 120, -200);
   space.add(cool);
   space.add(sun);
@@ -286,12 +467,17 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   scene.add(spice);
 
   /* ------------------------------------------------------------------ Boucle */
+  /* Progression de la scène d'orbite au repos : le rail compte (vh − haut) / (hauteur + vh), donc la scène, en haut de
+     page, vaut déjà vh / (hauteur + vh) (≈ 0,29) avant tout défilement. La sortie de soute part de cette valeur. */
+  let oRest = 0;
   const resize = () => {
     const w = canvas.clientWidth || window.innerWidth;
     const h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    const orb = document.getElementById("orbite");
+    oRest = orb ? window.innerHeight / (orb.offsetHeight + window.innerHeight) : 0;
   };
   resize();
   window.addEventListener("resize", resize);
@@ -356,7 +542,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     prescienceBlend += ((state.prescience ? 1 : 0) - prescienceBlend) * sm(0.05);
 
     // Chapitre 1 — soute et orbite : la frégate descend sous le long-courrier, le vaisseau recule, la planète monte.
-    const exitT = clamp01(o / 0.55);            // sortie de soute
+    const exitT = clamp01((o - oRest) / Math.max(0.1, 0.55 - oRest)); // sortie de soute : 0 en haut de page, 1 à o = 0,55
     const orbitT = clamp01((o - 0.45) / 0.55);   // éloignement
     // Chapitre 2 — entrée : la planète remplit l'écran, puis la tempête.
     const entryT = e;
@@ -371,18 +557,29 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     spice.visible = s > 0.02 || dark > 0;
 
     if (space.visible) {
-      // Caméra : contre-plongée sous la coque, puis descente.
-      const yStart = -22, yExit = -96, yOrbit = -420;
-      const y = lerp(lerp(yStart, yExit, smoothstep(0, 1, exitT)), yOrbit, smoothstep(0, 1, orbitT) * entryT * 0 + smoothstep(0, 1, orbitT));
-      wantPos.set(-28 + Math.sin(exitT * 1.3) * 5 + orbitT * 20, y, 24 + exitT * 18 + orbitT * 30);
-      // Regard : d'abord la coque au-dessus, puis la planète en dessous.
-      const look = smoothstep(0.15, 0.9, orbitT);
+      // Caméra : contre-plongée sous la coque, puis descente. Cadrage : le fuseau file vers un point de fuite en haut à
+      // droite (regard tourné vers la gauche et un peu vers le bas) ; la colonne de texte, à gauche, reste dégagée.
+      // En portrait, caméra plus à gauche et regard plus bas : le vaisseau tient dans le coin supérieur droit, au-dessus
+      // du titre, loin de l'épigraphe et du paragraphe.
       const portrait = camera.aspect < 0.8;
-      const side = portrait ? -40 : 0; // téléphone : le regard porte plus à gauche et plus bas, le vaisseau monte à droite, le titre reste dégagé
-      tmp.set(18 + side, portrait ? 2 : 10, -150).lerp(new THREE.Vector3(0, -600, -200), look);
+      // Départ : presque au centre de la soute, 32 unités sous l'axe du fuseau (la coque, ses panneaux et ses feux
+      // remplissent un quart de l'écran). Bureau : regard 20° à gauche et 6° vers le bas → le fuseau file en diagonale
+      // dans le quart supérieur droit, la colonne de texte reste libre. Portrait : regard 3° à droite et 8° vers le bas →
+      // le fuseau occupe la bande au-dessus du titre (0–22 % de la hauteur), la planète n'est qu'un limbe en bas.
+      const x0 = -18, yStart = -10;
+      if (shuttleX0 !== x0) buildShuttles(x0);
+      const yExit = -96, yOrbit = -420;
+      const y = lerp(lerp(yStart, yExit, smoothstep(0, 1, exitT)), yOrbit, smoothstep(0, 1, orbitT) * entryT * 0 + smoothstep(0, 1, orbitT));
+      wantPos.set(x0 + Math.sin(exitT * 1.3) * 5 + orbitT * 20, y, 24 + exitT * 18 + orbitT * 30);
+      const look = smoothstep(0.15, 0.9, orbitT);
+      if (portrait) tmp.set(x0 + 9, yStart - 29, 24 - 165); else tmp.set(x0 - 69, yStart - 8, 24 - 156);
+      // En sortant, le regard remonte vers la bouche éclairée et le fuseau qu'on quitte (dès le début de la sortie,
+      // pour ne jamais le perdre de vue), puis bascule vers la planète.
+      tmp.lerp(wantTarget.set(x0 + (portrait ? 8 : 24), 30, -100), smoothstep(0, 0.9, exitT) * 0.9);
+      tmp.lerp(wantTarget.set(0, -600, -200), look);
       wantTarget.copy(tmp);
-      // Planète : loin et basse au début, elle monte vers nous pendant l'entrée.
-      const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60;
+      // Planète : loin et basse au début (plus basse en portrait : sous le paragraphe), elle monte pendant l'entrée.
+      const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60 - (portrait ? 150 : 60) * (1 - orbitT);
       const planetZ = lerp(-440, -420, orbitT) + entryT * 150;
       planet.position.set(10, planetY, planetZ);
       halo.position.copy(planet.position);
@@ -408,7 +605,38 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
         frigates.setMatrixAt(i, dummy.matrix);
       }
       frigates.instanceMatrix.needsUpdate = true;
-      (shipLights.material as THREE.PointsMaterial).opacity = 0.7 + 0.3 * Math.sin(time * 2.2);
+      // Navettes : chacune suit sa boucle (entrée par la bouche, montée dans la soute, demi-tour, sortie, grand tour
+      // au-dessus de la planète), le nez dans la tangente, son feu à sa suite.
+      for (let i = 0; i < SHUTTLE_N; i++) {
+        const curve = shuttleCurves[i % 2];
+        const u = (time * shuttleSpeed[i] + shuttlePhase[i]) % 1;
+        curve.getPointAt(u, dummy.position);
+        curve.getTangentAt(u, tangent);
+        dummy.quaternion.setFromUnitVectors(UP, tangent);
+        dummy.scale.setScalar(1.6);
+        dummy.updateMatrix();
+        shuttles.setMatrixAt(i, dummy.matrix);
+        shuttlePos[i * 3] = dummy.position.x - tangent.x * 1.3;
+        shuttlePos[i * 3 + 1] = dummy.position.y - tangent.y * 1.3;
+        shuttlePos[i * 3 + 2] = dummy.position.z - tangent.z * 1.3;
+      }
+      shuttles.instanceMatrix.needsUpdate = true;
+      shuttleGeo.attributes.position.needsUpdate = true;
+      lightMat.uniforms.uTime.value = time;
+      // Sortie de soute : la lumière s'ouvre. Bouche et lampes montent, la lumière de la planète monte, la poussière en
+      // suspension s'estompe.
+      const open = smoothstep(0.15, 0.8, exitT);
+      glowMat.uniforms.uAlpha.value = 0.12 + 0.75 * open;
+      mouthMat.emissiveIntensity = 0.12 + 0.3 * open;
+      bayMat.emissiveIntensity = 0.45 + 0.55 * open;
+      for (const lamp of bayLamps) lamp.intensity = 2600 * (0.5 + 0.5 * open);
+      underLight.intensity = 90000 * (0.35 + 0.65 * open);
+      shine.intensity = 1.6 * (0.55 + 0.45 * open);
+      if (dust.visible) {
+        dustMat.uniforms.uTime.value = time;
+        dustMat.uniforms.uAlpha.value = 0.55 * (1 - smoothstep(0.45, 0.9, exitT));
+        dust.position.set(x0, yStart, 24);
+      }
       // Brouillard : l'espace est net ; la tempête l'épaissit, ocre.
       fogColor.copy(spaceFog).lerp(stormFog, stormT);
       (scene.fog as THREE.FogExp2).density = stormT * 0.012;

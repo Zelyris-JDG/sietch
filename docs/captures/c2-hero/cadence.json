@@ -1,0 +1,19 @@
+{
+  "methode": "scripts/diag-cadence.mjs : requestAnimationFrame comptés pendant 5 s sur la scène d'orbite (18 %), Chromium SwiftShader (rendu logiciel, 4 cœurs → niveau « low »), machine partagée avec d'autres agents : bruit ±50 % d'un essai à l'autre. Seule l'alternance avant/après dans la même minute est comparable.",
+  "avant_commit": "5be01c9 (servi sur :3211 depuis une extraction git archive)",
+  "apres_commit": "version finale du lot 1 (servie sur :3201)",
+  "mesures_sequentielles_non_fiables": {
+    "avant_16h50": { "bureau": 12.4, "mobile": 27.2 },
+    "apres_17h12": { "bureau": 10.2, "mobile": 29.8 },
+    "avant_17h15": { "bureau": 6.0, "mobile": 22.6 },
+    "apres_17h16": { "bureau": 4.4, "mobile": 15.0 }
+  },
+  "alternance_17h21_17h23": [
+    { "version": "avant", "bureau": 4.2, "mobile": 12.2 },
+    { "version": "apres", "bureau": 8.6, "mobile": 23.8 },
+    { "version": "avant", "bureau": 11.4, "mobile": 19.6 },
+    { "version": "apres", "bureau": 6.8, "mobile": 22.6 }
+  ],
+  "moyennes_alternance": { "avant": { "bureau": 7.8, "mobile": 15.9 }, "apres": { "bureau": 7.7, "mobile": 23.2 } },
+  "verdict": "aucune régression mesurable dans le bruit (bureau −1 %, mobile +46 % sur les moyennes alternées) ; à confirmer sur une vraie carte graphique (Johan, téléphone Android)"
+}

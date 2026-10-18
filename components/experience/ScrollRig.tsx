@@ -180,7 +180,7 @@ export function ScrollRig() {
         wind += (target - wind) * Math.min(1, dt * 3);
         ambience.setWind(wind);
         const o = state.progress.orbite;
-        const ship = o < 0.55 ? 0.75 * (1 - o / 0.55) : 0;
+        const ship = o < 0.5 ? 0.45 + 0.5 * Math.sin((Math.PI / 2) * clamp01((o - 0.28) / 0.14)) : 0.95 * (1 - clamp01((o - 0.5) / 0.25)) ** 2; // grondement : sourd dans la soute (o ≈ 0,29 au repos), qui monte à la sortie (pic 0,42–0,5), puis s'éteint vers 0,75
         ambience.setRumble(Math.max(ship, state.worm * 0.9));
       }
       notify();

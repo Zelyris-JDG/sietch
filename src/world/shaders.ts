@@ -243,9 +243,12 @@ export const WIND_VERT = /* glsl */ `
   }
 `;
 
+/** Coque du long-courrier. La normale est portée en espace MONDE (et non en espace vue) : les deux lumières du
+ *  nuanceur — rasante chaude côté planète, froide à l'opposé — restent fixes par rapport au vaisseau quand la caméra
+ *  tourne, et le volume du fuseau se lit. Aucune mise à l'échelle sur ce maillage : mat3(modelMatrix) suffit. */
 export const HULL_VERT = /* glsl */ `
   varying vec3 vN; varying vec3 vW; varying vec3 vL;
-  void main() { vN = normalize(normalMatrix * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vL = position; gl_Position = projectionMatrix * viewMatrix * w; }
+  void main() { vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vL = position; gl_Position = projectionMatrix * viewMatrix * w; }
 `;
 export const HULL_FRAG = /* glsl */ `
   precision highp float;
@@ -257,26 +260,95 @@ export const HULL_FRAG = /* glsl */ `
     /* coordonnées cylindriques du fuseau : le long de l'axe (y local du tour) et autour */
     float along = vL.y;
     float ang = atan(vL.z, vL.x);
-    float pa = floor(along / 7.0);
-    float pb = floor(ang / 0.3);
-    float id = hash12(vec2(pa, pb));
-    float seam = min(abs(fract(along / 7.0) - 0.5) * 2.0, abs(fract(ang / 0.3) - 0.5) * 2.0);
-    float groove = smoothstep(0.0, 0.09, seam);
-    float fine = smoothstep(0.0, 0.05, abs(fract(along / 1.75) - 0.5) * 2.0);
-    vec3 base = mix(vec3(0.16, 0.13, 0.11), vec3(0.50, 0.42, 0.35), id);
-    base *= (0.18 + 0.82 * groove) * (0.8 + 0.2 * fine);
-    base += (fbm2(vL.xy * 0.6) - 0.5) * 0.06;
+    /* Hiérarchie des panneaux : grands (rares, certains plus sombres), moyens (fréquents), joints fins. Les lignes
+       de joints sont d'autant plus fines que le panneau est petit : l'œil lit d'abord les grandes tôles. */
+    vec2 gBig = vec2(floor(along / 26.0), floor(ang / 0.7854));
+    float idBig = hash12(gBig + 3.0);
+    float seamBig = min(abs(fract(along / 26.0) - 0.5) * 2.0, abs(fract(ang / 0.7854) - 0.5) * 2.0);
+    float grooveBig = smoothstep(0.0, 0.045, seamBig);
+    vec2 gMid = vec2(floor(along / 6.5), floor(ang / 0.2618));
+    float idMid = hash12(gMid);
+    float seamMid = min(abs(fract(along / 6.5) - 0.5) * 2.0, abs(fract(ang / 0.2618) - 0.5) * 2.0);
+    float grooveMid = smoothstep(0.0, 0.05, seamMid);
+    float fine = smoothstep(0.0, 0.07, abs(fract(along / 1.625) - 0.5) * 2.0);
+    float dark = step(0.76, idBig);
+    vec3 base = vec3(0.36, 0.30, 0.25) * (0.84 + 0.32 * idMid);
+    base = mix(base, base * 0.5, dark);
+    base *= (0.3 + 0.7 * grooveBig) * (0.62 + 0.38 * grooveMid) * (0.92 + 0.08 * fine);
+    base += (noise2(vL.xy * 0.35) - 0.5) * 0.06; /* usure : une octave suffit (quatre coûtaient cher en rendu logiciel) */
+    /* deux longerons peints sombres, de la proue à la poupe */
+    float spar = smoothstep(0.03, 0.06, abs(fract(ang / 3.14159 + 0.37) - 0.5));
+    base *= 0.72 + 0.28 * spar;
     vec3 s = normalize(uSunDir);
     float ndl = max(dot(n, s), 0.0);
     float shine = max(dot(n, normalize(uShineDir)), 0.0);
     vec3 v = normalize(cameraPosition - vW);
     float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
-    vec3 col = base * (0.12 + 1.2 * ndl) * vec3(1.0, 0.93, 0.82);
-    col += base * shine * vec3(0.95, 0.58, 0.26) * 1.6;
-    col += rim * base * vec3(0.9, 0.62, 0.32) * 0.5;
-    /* hublots : rares, sur les panneaux, battement lent */
-    float win = step(0.975, hash12(vec2(pa * 3.1 + 0.5, pb * 7.7 + 0.2))) * groove * step(0.4, fract(along / 7.0)) * step(fract(along / 7.0), 0.6);
-    col += vec3(0.98, 0.74, 0.32) * win * (1.2 + 0.6 * sin(uTime * 0.9 + id * 40.0));
+    vec3 col = base * (0.07 + 0.95 * ndl) * vec3(0.80, 0.87, 1.0);
+    col += base * pow(shine, 1.3) * vec3(1.0, 0.58, 0.25) * 2.0;
+    col += rim * base * vec3(0.95, 0.62, 0.30) * 0.6;
+    /* reflet métallique fin côté planète, coupé par les joints */
+    vec3 hv = normalize(normalize(uShineDir) + v);
+    col += pow(max(dot(n, hv), 0.0), 36.0) * vec3(1.0, 0.72, 0.42) * 0.22 * grooveMid;
+    /* hublots : rares, centrés sur un panneau moyen, battement lent */
+    float cell = step(0.35, fract(along / 6.5)) * step(fract(along / 6.5), 0.65) * step(0.3, fract(ang / 0.2618)) * step(fract(ang / 0.2618), 0.7);
+    float win = step(0.962, hash12(gMid * 7.7 + 0.2)) * grooveMid * cell;
+    col += vec3(0.98, 0.74, 0.32) * win * (1.1 + 0.5 * sin(uTime * 0.9 + idMid * 40.0));
     gl_FragColor = vec4(col, 1.0);
+  }
+`;
+
+/** Feux de position : disques ronds et doux (jamais les carrés du PointsMaterial), halo, clignotement propre à chaque
+ *  feu — un quart d'entre eux sont des éclats brefs, les autres un battement lent. Couleurs par sommet (aColor). */
+export const LIGHT_VERT = /* glsl */ `
+  attribute float aSeed; attribute float aSize; attribute vec3 aColor;
+  uniform float uTime; uniform float uPixelRatio; uniform float uFade; uniform float uMax;
+  varying vec3 vC; varying float vA;
+  void main() {
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    float depth = max(-mv.z, 1.0);
+    float ph = uTime * (0.5 + aSeed * 1.3) + aSeed * 50.0;
+    float strobe = step(0.75, aSeed);
+    float flash = pow(max(sin(ph * 3.14159), 0.0), 28.0);
+    float steady = 0.72 + 0.28 * sin(ph * 2.0);
+    float k = mix(steady, 0.06 + flash, strobe);
+    vA = k * uFade;
+    vC = aColor;
+    gl_PointSize = aSize * uPixelRatio * clamp(220.0 / depth, 1.6, uMax) * (0.75 + 0.25 * k);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+export const LIGHT_FRAG = /* glsl */ `
+  precision mediump float;
+  varying vec3 vC; varying float vA;
+  void main() {
+    vec2 c = gl_PointCoord - 0.5;
+    float r2 = dot(c, c) * 4.0;
+    float core = 1.0 - smoothstep(0.0, 0.14, r2);
+    float halo = 1.0 - smoothstep(0.08, 1.0, r2);
+    halo *= halo;
+    float a = (core + 0.32 * halo) * vA;
+    if (a < 0.004) discard;
+    gl_FragColor = vec4(vC * (0.55 + 0.6 * core) + vec3(0.38) * core, a);
+  }
+`;
+
+/** Lueur de la bouche de la soute : un disque additif, cœur doux et anneau de lampes au bord. */
+export const GLOW_VERT = /* glsl */ `
+  varying vec2 vUv;
+  void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+`;
+export const GLOW_FRAG = /* glsl */ `
+  precision mediump float;
+  uniform vec3 uColor; uniform float uAlpha; uniform float uRing;
+  varying vec2 vUv;
+  void main() {
+    vec2 c = vUv - 0.5;
+    float r = length(c) * 2.0;
+    float core = 1.0 - smoothstep(0.0, 1.0, r);
+    core *= core;
+    float ring = exp(-pow((r - 0.86) / 0.07, 2.0));
+    float a = (core * 0.7 + ring * uRing) * uAlpha * smoothstep(1.0, 0.95, r);
+    gl_FragColor = vec4(uColor * a, a);
   }
 `;
