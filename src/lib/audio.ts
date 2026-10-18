@@ -75,7 +75,7 @@ export class Ambience {
       const bp = ctx.createBiquadFilter();
       bp.type = "bandpass";
       bp.frequency.value = 420;
-      bp.Q.value = 0.7;
+      bp.Q.value = 0.9;
       const windGain = ctx.createGain();
       windGain.gain.value = 0;
       const wlfo = ctx.createOscillator();
@@ -129,14 +129,14 @@ export class Ambience {
   setWind(v: number): void {
     if (!this.ctx || !this.windGain || !this.windFilter || !this.running) return;
     const t = this.ctx.currentTime;
-    this.windGain.gain.setTargetAtTime(0.04 + v * 0.42, t, 0.12);
+    this.windGain.gain.setTargetAtTime(0.03 + v * 0.26, t, 0.12);
     this.windFilter.frequency.setTargetAtTime(380 + v * 1100, t, 0.18);
   }
 
   /** v : 0 → 1, présence du long-courrier ou du ver. */
   setRumble(v: number): void {
     if (!this.ctx || !this.rumbleGain || !this.running) return;
-    this.rumbleGain.gain.setTargetAtTime(v * 1.1, this.ctx.currentTime, 0.35);
+    this.rumbleGain.gain.setTargetAtTime(v * 0.8, this.ctx.currentTime, 0.35);
   }
 
   /** Teinte prescience : la nappe monte d'une quinte, plus douce. */

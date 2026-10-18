@@ -42,10 +42,11 @@ export function deviceTier(): "low" | "high" {
   return "high";
 }
 
+/** three.js (r163 et plus) exige WebGL 2 : sans lui, la version calme. */
 export function webglAvailable(): boolean {
   try {
     const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") ?? c.getContext("webgl"));
+    return !!c.getContext("webgl2");
   } catch {
     return false;
   }
