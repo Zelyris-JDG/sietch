@@ -232,10 +232,12 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   space.add(planetShine);
 
   /* ------------------------------------------------------------------ Tempête de poussière */
+  /* La poussière suit la lumière du ciel réel : cuivrée le jour, brune au crépuscule, presque éteinte la nuit. */
+  const STORM_TINT: Record<string, [number, number, number]> = { day: [0.86, 0.58, 0.30], dusk: [0.78, 0.48, 0.25], night: [0.40, 0.29, 0.20] };
   const stormCount = high ? 9000 : 2600;
   const stormMat = keep(new THREE.ShaderMaterial({
     vertexShader: PARTICLE_VERT, fragmentShader: PARTICLE_FRAG, transparent: true, depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uSpeed: { value: 55 }, uDir: { value: new THREE.Vector3(1, -0.15, 0.1).normalize() }, uSpan: { value: 180 }, uPixelRatio: { value: pixelRatio }, uColor: { value: new THREE.Color(0.86, 0.58, 0.30) } },
+    uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uSpeed: { value: 55 }, uDir: { value: new THREE.Vector3(1, -0.15, 0.1).normalize() }, uSpan: { value: 180 }, uPixelRatio: { value: pixelRatio }, uColor: { value: new THREE.Color(...(STORM_TINT[skyName] ?? STORM_TINT.night)) } },
   }));
   const storm = new THREE.Points(keep(particleGeometry(stormCount, new THREE.Vector3(180, 120, 160), rand, 1.6, 6.0)), stormMat);
   storm.frustumCulled = false;
@@ -301,7 +303,8 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   const skyFog: Record<string, number> = { day: 0xcfb48c, dusk: 0x8a4a24, night: 0x0a0d1c };
   const desertFog = new THREE.Color(skyFog[skyName] ?? skyFog.night);
   const spaceFog = new THREE.Color(0x05040a);
-  const stormFog = new THREE.Color(0x9a6232);
+  const stormFogBySky: Record<string, number> = { day: 0x9a6232, dusk: 0x74421f, night: 0x2a1c14 };
+  const stormFog = new THREE.Color(stormFogBySky[skyName] ?? stormFogBySky.night);
   let raf = 0;
   let running = true;
   let lost = false;
