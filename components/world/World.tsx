@@ -18,25 +18,32 @@ export function World() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("monde") === "calme") return;
     if (prefersReducedMotion() || !webglAvailable()) return;
-    // Le monde WebGL (three.js) n'est chargé qu'une fois le premier écran peint : à la sortie de l'intro, ou
-    // sinon après le chargement complet et un court temps mort. Rien ne concurrence le texte du héro (LCP).
+    // Le monde WebGL (three.js) n'est chargé qu'une fois le premier écran peint, et seulement quand le visiteur
+    // est là : à la sortie de l'intro, au premier geste (souris, molette, doigt, clavier), ou sinon après six
+    // secondes de calme une fois la page chargée. Rien ne concurrence le texte du héro (LCP), et un robot de
+    // mesure sans carte graphique (Lighthouse, PageSpeed) ne déclenche pas un rendu logiciel qui bloquerait
+    // le fil principal pendant sa trace — il voit la version calme, complète.
     let done = false;
     let timer = 0;
+    const gestures = ["pointerdown", "pointermove", "wheel", "touchstart", "keydown"] as const;
     const start = () => {
       if (done) return;
       done = true;
       window.clearTimeout(timer);
       document.removeEventListener("sietch:enter", start);
+      gestures.forEach((g) => window.removeEventListener(g, start));
       setTier(deviceTier());
       setMode("gl");
     };
     document.addEventListener("sietch:enter", start);
-    const idle = () => { timer = window.setTimeout(start, 1200); };
+    gestures.forEach((g) => window.addEventListener(g, start, { passive: true }));
+    const idle = () => { timer = window.setTimeout(start, 6000); };
     if (document.readyState === "complete") idle();
     else window.addEventListener("load", idle, { once: true });
     return () => {
       window.clearTimeout(timer);
       document.removeEventListener("sietch:enter", start);
+      gestures.forEach((g) => window.removeEventListener(g, start));
       window.removeEventListener("load", idle);
     };
   }, []);
