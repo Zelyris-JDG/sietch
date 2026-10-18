@@ -17,6 +17,8 @@ const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=sw
 for (const v of views) {
   const ctx = await browser.newContext({ viewport: v.viewport, isMobile: v.isMobile, hasTouch: v.hasTouch, deviceScaleFactor: v.deviceScaleFactor ?? 1, locale: "fr-FR" });
   const page = await ctx.newPage();
+  // --tier=high : ce Chromium (4 cœurs) tombe en niveau « low » ; on lui prête 8 cœurs et 8 Go pour voir la version complète (bureau : high, téléphone : mid).
+  if (a.tier === "high") await page.addInitScript(() => { Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 8 }); Object.defineProperty(navigator, "deviceMemory", { get: () => 8 }); });
   page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") console.log(`[${v.name}] console.${m.type()}: ${m.text().slice(0, 200)}`); });
   await page.goto(url, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "Entrer en silence" }).click();

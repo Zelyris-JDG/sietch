@@ -348,7 +348,7 @@ export const GLOW_FRAG = /* glsl */ `
     float core = 1.0 - smoothstep(0.0, 1.0, r);
     core *= core;
     float ring = exp(-pow((r - 0.86) / 0.07, 2.0));
-    float a = (core * 0.5 + ring * uRing) * uAlpha * smoothstep(1.0, 0.95, r);
+    float a = (core * 0.7 + ring * uRing) * uAlpha * smoothstep(1.0, 0.95, r);
     gl_FragColor = vec4(uColor * a, a);
   }
 `;

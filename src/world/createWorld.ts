@@ -295,11 +295,11 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   const bay = new THREE.Group();
   const bayMat = keep(new THREE.MeshStandardMaterial({ color: 0x2a221c, roughness: 0.9, metalness: 0.3, emissive: 0x2a1a0a, emissiveIntensity: 0.8 }));
   // Le dernier arceau est la bouche : un anneau de lampes ambre, plus lumineux à mesure que l'on sort.
-  const mouthMat = keep(new THREE.MeshStandardMaterial({ color: 0x3a2c20, roughness: 0.6, metalness: 0.3, emissive: 0xf2b544, emissiveIntensity: 0.5 }));
+  const mouthMat = keep(new THREE.MeshStandardMaterial({ color: 0x3a2c20, roughness: 0.6, metalness: 0.3, emissive: 0xe8902a, emissiveIntensity: 0.12 }));
   const bayLamps: THREE.PointLight[] = [];
   for (let i = 0; i < 6; i++) {
     const r = 26 + i * 2.5;
-    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, i === 5 ? 1.4 : 1.1, 8, 72)), i === 5 ? mouthMat : bayMat);
+    const ring = new THREE.Mesh(keep(new THREE.TorusGeometry(r, i === 5 ? 1.2 : 1.1, 8, 72)), i === 5 ? mouthMat : bayMat);
     ring.rotation.x = Math.PI / 2;
     ring.position.set(0, -4 - i * 11, 0);
     bay.add(ring);
@@ -354,6 +354,8 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   // (l'une le miroir de l'autre par rapport à l'axe de la soute), orientées selon la tangente, un feu à éclats chacune.
   const SHUTTLE_N = 4;
   const shuttles = new THREE.InstancedMesh(frigateGeo, frigateMat, SHUTTLE_N);
+  shuttles.frustumCulled = false; // la sphère englobante d'un InstancedMesh est figée au premier rendu : elles bougent trop pour elle
+  frigates.frustumCulled = false;
   space.add(shuttles);
   const loopBase: [number, number, number][] = [[2, -18, -26], [4, 12, -22], [18, 6, -16], [22, -23, -20], [24, -53, -32], [40, -103, -84], [20, -148, -164], [-20, -108, -134], [-10, -63, -38]];
   const shuttleCurves: THREE.CatmullRomCurve3[] = [];
@@ -459,12 +461,17 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
   scene.add(spice);
 
   /* ------------------------------------------------------------------ Boucle */
+  /* Progression de la scène d'orbite au repos : le rail compte (vh − haut) / (hauteur + vh), donc la scène, en haut de
+     page, vaut déjà vh / (hauteur + vh) (≈ 0,29) avant tout défilement. La sortie de soute part de cette valeur. */
+  let oRest = 0;
   const resize = () => {
     const w = canvas.clientWidth || window.innerWidth;
     const h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    const orb = document.getElementById("orbite");
+    oRest = orb ? window.innerHeight / (orb.offsetHeight + window.innerHeight) : 0;
   };
   resize();
   window.addEventListener("resize", resize);
@@ -529,7 +536,7 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
     prescienceBlend += ((state.prescience ? 1 : 0) - prescienceBlend) * sm(0.05);
 
     // Chapitre 1 — soute et orbite : la frégate descend sous le long-courrier, le vaisseau recule, la planète monte.
-    const exitT = clamp01(o / 0.55);            // sortie de soute
+    const exitT = clamp01((o - oRest) / Math.max(0.1, 0.55 - oRest)); // sortie de soute : 0 en haut de page, 1 à o = 0,55
     const orbitT = clamp01((o - 0.45) / 0.55);   // éloignement
     // Chapitre 2 — entrée : la planète remplit l'écran, puis la tempête.
     const entryT = e;
@@ -557,11 +564,13 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       // Regard : d'abord un point fixe devant, au niveau de la bouche (en descendant, le regard remonte vers elle),
       // puis la planète en dessous.
       const look = smoothstep(0.15, 0.9, orbitT);
-      if (portrait) tmp.set(x0 - 12, -56, -138); else tmp.set(x0 - 36, -36, -140);
-      tmp.lerp(new THREE.Vector3(0, -600, -200), look);
+      if (portrait) tmp.set(x0 + 17, -59, -136); else tmp.set(x0 - 36, -36, -140);
+      // En sortant, le regard remonte vers la bouche éclairée et le fuseau qu'on quitte.
+      tmp.lerp(wantTarget.set(x0 + (portrait ? 10 : 24), 30, -100), smoothstep(0.2, 1, exitT) * 0.85);
+      tmp.lerp(wantTarget.set(0, -600, -200), look);
       wantTarget.copy(tmp);
       // Planète : loin et basse au début (plus basse encore en portrait : sous le paragraphe), elle monte pendant l'entrée.
-      const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60 - (portrait ? 70 * (1 - orbitT) : 0);
+      const planetY = lerp(-238, -250, smoothstep(0, 1, orbitT)) + entryT * 60 - (portrait ? 150 * (1 - orbitT) : 0);
       const planetZ = lerp(-440, -420, orbitT) + entryT * 150;
       planet.position.set(10, planetY, planetZ);
       halo.position.copy(planet.position);
@@ -608,8 +617,8 @@ export function createWorld(canvas: HTMLCanvasElement, { tier }: WorldOptions): 
       // Sortie de soute : la lumière s'ouvre. Bouche et lampes montent, la lumière de la planète monte, la poussière en
       // suspension s'estompe.
       const open = smoothstep(0.15, 0.8, exitT);
-      glowMat.uniforms.uAlpha.value = 0.1 + 0.5 * open;
-      mouthMat.emissiveIntensity = 0.5 + 1.4 * open;
+      glowMat.uniforms.uAlpha.value = 0.12 + 0.75 * open;
+      mouthMat.emissiveIntensity = 0.12 + 0.3 * open;
       bayMat.emissiveIntensity = 0.45 + 0.55 * open;
       for (const lamp of bayLamps) lamp.intensity = 2600 * (0.5 + 0.5 * open);
       underLight.intensity = 90000 * (0.35 + 0.65 * open);
