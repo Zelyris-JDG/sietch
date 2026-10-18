@@ -1,0 +1,25 @@
+/* ---- 404 « Hors des cartes » : basalte, quadrillage d'une carte qui s'efface, relevé Mentat ------------------
+   Tout est statique (aucune animation) : identique en mouvement réduit. */
+.nf { min-height: 100vh; min-height: 100svh; box-sizing: border-box; }
+.nf::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(242, 181, 68, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(242, 181, 68, 0.07) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(75% 65% at 28% 32%, #000 0%, transparent 100%);
+  mask-image: radial-gradient(75% 65% at 28% 32%, #000 0%, transparent 100%);
+}
+.nf__index { margin: 0; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.nf .nf__epigraph { margin: 1.6rem 0 2.2rem; font-size: clamp(1.35rem, 2.6vw, 2.1rem); }
+.nf__readout { display: grid; gap: 6px; width: max-content; max-width: 100%; margin: 0 0 2rem; padding: 14px 16px; border: 1px solid rgba(242, 181, 68, 0.28); background: rgba(6, 5, 4, 0.9); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.nf__readout div { display: flex; flex-wrap: wrap; gap: 0 10px; }
+.nf__readout dt { color: var(--muted); }
+.nf__readout dt::after { content: " —"; }
+.nf__readout dd { margin: 0; color: var(--amber); }
+.nf__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; max-width: none; }
+@media (forced-colors: active) { .nf::before { display: none; } }
